@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Light House · Today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050807}
+a{color:#22E07A}a:hover{color:#5BF09E}
+.g{background:rgba(255,255,255,0.04);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.10)}
+.m{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s cubic-bezier(.2,.8,.2,1)}
+button:active{transform:scale(0.94)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #22E07A;outline-offset:2px}
+@media (prefers-reduced-transparency:reduce){.g{background:#0E1411;-webkit-backdrop-filter:none;backdrop-filter:none}}
+@media (prefers-contrast:more){.g{background:#0E1411;border-color:rgba(255,255,255,0.4)}}
+@media (prefers-reduced-motion:reduce){button,button:active{transition:none;transform:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: #E8F0EC; background: radial-gradient(120% 45% at 50% -8%, rgba(34,224,122,0.13), rgba(34,224,122,0) 62%), #050807">
+<main style="display: flex; flex-direction: column; gap: 14px; padding: 22px 16px 0">
+
+<header style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 4px 4px 2px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="m" style="font-size: 11px; letter-spacing: 0.14em; color: #8A9A92">LIGHT HOUSE · FRI 30 OCT</span>
+<h1 style="margin: 0; font-size: 30px; line-height: 1.05; letter-spacing: -0.02em; font-weight: 650">Today</h1>
+</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<span class="m" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(34,224,122,0.35); font-size: 11px; letter-spacing: 0.08em; color: #22E07A"><span style="width: 6px; height: 6px; border-radius: 50%; background: #22E07A; box-shadow: 0 0 8px #22E07A"></span>OCT · OPEN</span>
+<button class="g m" aria-label="Account: Ayman" style="width: 44px; height: 44px; border-radius: 50%; font-size: 13px; font-weight: 600">AY</button>
+</div>
+</header>
+
+<section class="g" style="border-radius: 20px; padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span class="m" style="font-size: 11px; letter-spacing: 0.12em; color: #8A9A92">YOUR MEALS · SAT 31 OCT</span>
+<span style="font-size: 16px; font-weight: 600">Tomorrow</span>
+</div>
+<span class="m" style="font-size: 11px; letter-spacing: 0.08em; color: {{syncColor}}">{{syncLabel}}</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<button class="g" aria-label="Remove half a meal" onClick="{{dec}}" style="width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg>
+</button>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span class="m" aria-live="polite" style="font-size: 64px; line-height: 1; font-weight: 500; letter-spacing: -0.04em">{{mine}}</span>
+<span class="m" style="font-size: 12px; color: #8A9A92">meals · ≈ ৳{{mineCost}}</span>
+</div>
+<button class="g" aria-label="Add half a meal" onClick="{{inc}}" style="width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; border-color: rgba(34,224,122,0.55); color: #22E07A; box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 0 22px rgba(34,224,122,0.22)">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</button>
+</div>
+<div role="group" aria-label="Quick set" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{chips}}" as="c" hint-placeholder-count="5">
+<button class="m" aria-pressed="{{c.pressed}}" onClick="{{c.pick}}" style="height: 44px; border-radius: 12px; font-size: 14px; background: {{c.bg}}; border: 1px solid {{c.border}}; color: {{c.color}}">{{c.label}}</button>
+</sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: rgba(245,184,61,0.08); border: 1px solid rgba(245,184,61,0.25); color: #F5B83D">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0zM12 6v6l4 2"></path></svg>
+<span style="font-size: 13px">Locks at 22:00 tonight</span>
+<span class="m" style="margin-left: auto; font-size: 13px">{{countdown}}</span>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div class="g" style="border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px">
+<span class="m" style="font-size: 10px; letter-spacing: 0.1em; color: #8A9A92">MEAL RATE</span>
+<span class="m" style="font-size: 17px; font-weight: 600">৳92.53</span>
+</div>
+<div class="g" style="border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px">
+<span class="m" style="font-size: 10px; letter-spacing: 0.1em; color: #8A9A92">MY MEALS</span>
+<span class="m" style="font-size: 17px; font-weight: 600">23.5</span>
+</div>
+<a href="Phone-Report.dc.html" class="g" style="border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: #FF5C5C">
+<span class="m" style="font-size: 10px; letter-spacing: 0.1em; color: #8A9A92">TO PAY</span>
+<span class="m" style="font-size: 17px; font-weight: 600">৳5,425</span>
+</a>
+</section>
+
+<section class="g" style="border-radius: 20px; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px">
+<span style="font-size: 15px; font-weight: 600">Everyone · Sat 31</span>
+<span class="m" style="padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(90,169,255,0.45); color: #5AA9FF; font-size: 10px; letter-spacing: 0.08em">MANAGER</span>
+<span class="m" style="margin-left: auto; font-size: 13px; color: #8A9A92">Σ {{total}}</span>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 10px; padding: 4px 8px 4px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+<span class="m" aria-hidden="true" style="width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; background: rgba(255,255,255,0.06); color: #C9D6CF">{{r.ini}}</span>
+<span style="flex: 1; font-size: 15px">{{r.name}}</span>
+<sc-if value="{{r.you}}" hint-placeholder-val="{{false}}"><span class="m" style="font-size: 10px; letter-spacing: 0.1em; color: #22E07A">YOU</span></sc-if>
+<button aria-label="{{r.decLabel}}" onClick="{{r.dec}}" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; color: #8A9A92; display: grid; place-items: center">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg>
+</button>
+<span class="m" style="width: 34px; text-align: center; font-size: 15px">{{r.v}}</span>
+<button aria-label="{{r.incLabel}}" onClick="{{r.inc}}" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; color: #E8F0EC; display: grid; place-items: center">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</button>
+</div>
+</sc-for>
+</section>
+</main>
+
+<nav class="g" aria-label="Primary" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 8px 6px 26px; border-radius: 0; border-left: 0; border-right: 0; border-bottom: 0; background: rgba(8,12,10,0.72)">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="{{t.href}}" aria-current="{{t.cur}}" style="display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 48px; padding-top: 4px; text-decoration: none; font-size: 11px; color: {{t.color}}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.d}}"></path></svg>
+<span>{{t.label}}</span>
+<span style="width: 4px; height: 4px; border-radius: 50%; background: {{t.dot}}; box-shadow: 0 0 8px {{t.dot}}"></span>
+</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { v: { Ayman: 2, Saad: 2, Alif: 1.5, Asif: 2 }, synced: true };
+  }
+  componentDidMount() { this.timer = setInterval(() => this.forceUpdate(), 1000); }
+  componentWillUnmount() { clearInterval(this.timer); clearTimeout(this.syncT); }
+  fmt(n) { return n % 1 ? n.toFixed(1) : String(n); }
+  set(name, val) {
+    const v = Object.assign({}, this.state.v);
+    v[name] = Math.max(0, Math.min(9, Math.round(val * 2) / 2));
+    this.setState({ v: v, synced: false });
+    clearTimeout(this.syncT);
+    this.syncT = setTimeout(() => this.setState({ synced: true }), 600);
+  }
+  countdown() {
+    const now = Date.now();
+    const d = new Date(now + 6 * 3600e3);
+    let target = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 22, 0, 0) - 6 * 3600e3;
+    if (target <= now) target += 86400e3;
+    let s = Math.floor((target - now) / 1000);
+    const p = (n) => String(n).padStart(2, '0');
+    return p(Math.floor(s / 3600)) + ':' + p(Math.floor(s % 3600 / 60)) + ':' + p(s % 60);
+  }
+  tabs(active) {
+    const T = [
+      ['Today', 'Main.dc.html', 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4'],
+      ['Meals', 'Phone-Meals.dc.html', 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z'],
+      ['Bazar', 'Phone-Bazar.dc.html', 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0'],
+      ['Report', 'Phone-Report.dc.html', 'M3 3v18h18M8 16v-4M13 16V8M18 16v-7'],
+      ['More', 'Phone-Close.dc.html', 'M4 6h16M4 12h16M4 18h16']
+    ];
+    return T.map(([label, href, d]) => ({ label, href, d, cur: label === active ? 'page' : 'false', color: label === active ? '#22E07A' : '#8A9A92', dot: label === active ? '#22E07A' : 'transparent' }));
+  }
+  renderVals() {
+    const v = this.state.v;
+    const mine = v.Ayman;
+    const names = ['Ayman', 'Saad', 'Alif', 'Asif'];
+    const total = names.reduce((a, n) => a + v[n], 0);
+    return {
+      mine: this.fmt(mine),
+      mineCost: Math.ceil(mine * 92.5314),
+      dec: () => this.set('Ayman', mine - 0.5),
+      inc: () => this.set('Ayman', mine + 0.5),
+      syncLabel: this.state.synced ? 'SYNCED' : 'SAVING…',
+      syncColor: this.state.synced ? '#22E07A' : '#8A9A92',
+      countdown: this.countdown(),
+      chips: [0, 1, 1.5, 2, 3].map((n) => ({
+        label: this.fmt(n), pressed: mine === n ? 'true' : 'false',
+        bg: mine === n ? 'rgba(34,224,122,0.10)' : 'rgba(255,255,255,0.03)',
+        border: mine === n ? 'rgba(34,224,122,0.55)' : 'rgba(255,255,255,0.08)',
+        color: mine === n ? '#22E07A' : '#C9D6CF',
+        pick: () => this.set('Ayman', n)
+      })),
+      total: this.fmt(total),
+      rows: names.map((n) => ({
+        name: n, ini: n.slice(0, 2).toUpperCase(), you: n === 'Ayman', v: this.fmt(v[n]),
+        decLabel: 'Remove half a meal for ' + n, incLabel: 'Add half a meal for ' + n,
+        dec: () => this.set(n, v[n] - 0.5), inc: () => this.set(n, v[n] + 0.5)
+      })),
+      tabs: this.tabs('Today')
+    };
+  }
+}
+</script>
+</body>
+</html>

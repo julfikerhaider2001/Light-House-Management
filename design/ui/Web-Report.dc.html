@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Light House · Report (web)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050807}
+a{color:#22E07A}a:hover{color:#5BF09E}
+.g{background:rgba(255,255,255,0.04);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.10)}
+.m{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer;transition:transform .12s cubic-bezier(.2,.8,.2,1),background-color .15s}
+button:active{transform:scale(0.97)}
+button:focus-visible,a:focus-visible{outline:2px solid #22E07A;outline-offset:2px}
+.nav a:hover{background:rgba(255,255,255,0.05)}
+.tbl td,.tbl th{border-bottom:1px solid rgba(255,255,255,0.06);white-space:nowrap}
+.tbl tbody tr:hover td,.tbl tbody tr:hover th{background-color:rgba(255,255,255,0.025)}
+@media (prefers-reduced-transparency:reduce){.g{background:#0E1411;-webkit-backdrop-filter:none;backdrop-filter:none}}
+@media (prefers-contrast:more){.g{background:#0E1411;border-color:rgba(255,255,255,0.4)}}
+@media (prefers-reduced-motion:reduce){button,button:active{transition:none;transform:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: #E8F0EC; background: radial-gradient(70% 40% at 55% -10%, rgba(34,224,122,0.10), rgba(34,224,122,0) 65%), #050807">
+
+<aside class="g" style="flex: 1 1 248px; box-sizing: border-box; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; border-radius: 0; border-top: 0; border-left: 0; border-bottom: 0; background: rgba(255,255,255,0.025)">
+<a href="Web-Report.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 0 8px; text-decoration: none; color: #E8F0EC">
+<span style="width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; border: 1px solid rgba(34,224,122,0.45); color: #22E07A; box-shadow: 0 0 16px rgba(34,224,122,0.18)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3h4l1 4H9zM9 7h6l2 14H7zM8 13h8M3 5l3 1.2M21 5l-3 1.2"></path></svg>
+</span>
+<span style="display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 15px; font-weight: 650; letter-spacing: -0.01em">Light House</span>
+<span class="m" style="font-size: 10px; letter-spacing: 0.12em; color: #8A9A92">MESS MEAL MANAGER</span>
+</span>
+</a>
+<nav class="nav" aria-label="Primary" style="display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="9">
+<a href="{{n.href}}" aria-current="{{n.cur}}" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 14px; color: {{n.color}}; background: {{n.bg}}; border: 1px solid {{n.border}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.d}}"></path></svg>
+<span>{{n.label}}</span>
+</a>
+</sc-for>
+</nav>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+<div class="g" style="border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 600">Light House mess</span>
+<span class="m" style="font-size: 11px; color: #8A9A92">4 active · BDT · Asia/Dhaka</span>
+<button style="height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.10); background: transparent; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 8px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM20 20h1M17 20h1M20 17h1"></path></svg>Invite by code / QR</button>
+</div>
+<a href="Web-Status.dc.html" class="m" style="padding: 0 8px; font-size: 11px; color: #8A9A92; text-decoration: none; display: flex; align-items: center; gap: 6px"><span style="width: 6px; height: 6px; border-radius: 50%; background: #22E07A; box-shadow: 0 0 6px #22E07A"></span>build [sha] · healthy</a>
+</div>
+</aside>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 28px 32px 40px; display: flex; flex-direction: column; gap: 20px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span class="m" style="font-size: 11px; letter-spacing: 0.14em; color: #8A9A92">LIGHT HOUSE / REPORT</span>
+<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+<h1 style="margin: 0; font-size: 34px; line-height: 1.05; letter-spacing: -0.02em; font-weight: 650">October 2026</h1>
+<span class="m" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(34,224,122,0.35); font-size: 11px; letter-spacing: 0.08em; color: #22E07A"><span style="width: 6px; height: 6px; border-radius: 50%; background: #22E07A; box-shadow: 0 0 8px #22E07A"></span>OPEN · LIVE</span>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<button class="g" style="height: 40px; padding: 0 14px; border-radius: 10px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path></svg>Export CSV</button>
+<button class="g" style="height: 40px; padding: 0 14px; border-radius: 10px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2M6 14h12v7H6z"></path></svg>Print PDF</button>
+<button style="height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid rgba(34,224,122,0.6); background: rgba(34,224,122,0.08); color: #22E07A; font-size: 13px; font-weight: 600; box-shadow: 0 0 22px rgba(34,224,122,0.18)">Close month</button>
+</div>
+</header>
+
+<section aria-label="Overview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="6">
+<div class="g" style="border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<span class="m" style="font-size: 10px; letter-spacing: 0.12em; color: #8A9A92">{{s.k}}</span>
+<span class="m" style="font-size: 22px; font-weight: 500; letter-spacing: -0.02em">{{s.v}}</span>
+<span class="m" style="font-size: 11px; color: #8A9A92">{{s.n}}</span>
+</div>
+</sc-for>
+</section>
+
+<section class="g" style="border-radius: 18px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.06)">
+<h2 style="margin: 0; font-size: 16px; font-weight: 650">Per-member breakdown</h2>
+<span class="m" style="padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(90,169,255,0.45); color: #5AA9FF; font-size: 10px; letter-spacing: 0.08em">SHEET COLUMNS</span>
+<span class="m" style="margin-left: auto; font-size: 11px; color: #8A9A92"><span style="color: #5AA9FF">−</span> credit · F fixed rent</span>
+</div>
+<div style="overflow-x: auto">
+<table class="tbl m" style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px">
+<thead>
+<tr>
+<th scope="col" style="position: sticky; left: 0; background: #0A0F0D; text-align: left; padding: 12px 18px; font-size: 10px; letter-spacing: 0.1em; font-weight: 500; color: #8A9A92">MEMBER</th>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="14">
+<th scope="col" style="text-align: right; padding: 12px 12px; font-size: 10px; letter-spacing: 0.1em; font-weight: 500; color: {{c.color}}">{{c.k}}</th>
+</sc-for>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<tr>
+<th scope="row" style="position: sticky; left: 0; background: #090D0B; text-align: left; padding: 12px 18px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 600">{{r.name}}</th>
+<sc-for list="{{r.cells}}" as="c" hint-placeholder-count="14">
+<td style="text-align: right; padding: 12px; color: {{c.c}}; font-weight: {{c.w}}">{{c.v}}</td>
+</sc-for>
+</tr>
+</sc-for>
+</tbody>
+<tfoot>
+<tr style="background: rgba(34,224,122,0.05)">
+<th scope="row" style="position: sticky; left: 0; background: #0C1612; text-align: left; padding: 12px 18px; color: #22E07A; font-weight: 600">Σ</th>
+<sc-for list="{{tot}}" as="c" hint-placeholder-count="14">
+<td style="text-align: right; padding: 12px; font-weight: 600; color: {{c.c}}">{{c.v}}</td>
+</sc-for>
+</tr>
+</tfoot>
+</table>
+</div>
+<div class="m" style="display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 12px 18px; font-size: 11px; color: #8A9A92; border-top: 1px dashed rgba(90,169,255,0.25)">
+<span><span style="color: #5AA9FF">ROUNDING</span> sheet-compatible ৳21,413 → settled ৳21,410 (bills + extra + prev dues)</span>
+<span>largest remainder: Ayman −1 · Saad −1 · Asif −1</span>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div class="g" style="border-radius: 18px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px">
+<h2 style="margin: 0 0 8px; font-size: 15px; font-weight: 650">Bills · per head</h2>
+<sc-for list="{{bills}}" as="b" hint-placeholder-count="5">
+<div style="display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.05)">
+<span class="m" style="padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(201,167,255,0.4); color: #C9A7FF; font-size: 10px; letter-spacing: 0.08em">BILL</span>
+<span style="font-size: 14px">{{b.k}}</span>
+<span class="m" style="margin-left: auto; font-size: 13px">৳{{b.v}}</span>
+<span class="m" style="width: 92px; text-align: right; font-size: 12px; color: #8A9A92">{{b.p}}</span>
+</div>
+</sc-for>
+</div>
+<div class="g" style="border-radius: 18px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px">
+<h2 style="margin: 0 0 8px; font-size: 15px; font-weight: 650">Highlights</h2>
+<sc-for list="{{highs}}" as="h" hint-placeholder-count="5">
+<div style="display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.05); font-size: 14px">
+<span style="color: #8A9A92">{{h.k}}</span>
+<span class="m" style="font-size: 13px">{{h.v}}</span>
+</div>
+</sc-for>
+</div>
+<div class="g" style="border-radius: 18px; overflow: hidden; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 8px; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.06)">
+<h2 class="m" style="margin: 0; font-size: 12px; letter-spacing: 0.12em; font-weight: 600">ACTIVITY LOG</h2>
+<span class="m" style="margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.1em; color: #22E07A"><span style="width: 5px; height: 5px; border-radius: 50%; background: #22E07A; box-shadow: 0 0 6px #22E07A"></span>LIVE</span>
+</div>
+<div class="m" role="log" style="padding: 6px 0; font-size: 12px">
+<sc-for list="{{log}}" as="l" hint-placeholder-count="7">
+<div style="display: grid; grid-template-columns: 68px 52px 1fr; gap: 6px; padding: 5px 18px">
+<span style="color: #6F7F78">{{l.t}}</span>
+<span style="color: {{l.c}}">{{l.tag}}</span>
+<span style="color: #D5E0DA">{{l.msg}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const N = [
+      ['Today', 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4', '#'],
+      ['Meals', 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z', '#'],
+      ['Bazar', 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0', '#'],
+      ['Bills', 'M5 2v20l2.5-1.5L10 22l2-1.5 2 1.5 2.5-1.5L19 22V2l-2.5 1.5L14 2l-2 1.5L10 2 7.5 3.5zM9 8h6M9 12h6M9 16h4', '#'],
+      ['Report', 'M3 3v18h18M8 16v-4M13 16V8M18 16v-7', 'Web-Report.dc.html'],
+      ['Payments', 'M2 6h20v12H2zM2 10h20M6 15h4', '#'],
+      ['Close month', 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0zM8 12l3 3 5-6', '#'],
+      ['Activity', 'M22 12h-4l-3 9L9 3l-3 9H2', '#'],
+      ['Status', 'M3 4h18v6H3zM3 14h18v6H3zM7 7h.01M7 17h.01', 'Web-Status.dc.html']
+    ];
+    const K = ['MEALS', 'BAZAR', 'MEAL COST', 'HAVE TO PAY', 'KHALA', 'RENT', 'WIFI', 'GAS', 'INITIAL', 'PREV DUE', 'TOTAL', 'EXTRA', 'FINAL', 'SETTLED'];
+    const R = [
+      ['Ayman', ['23.5', '2,548', '2,175', '−373', '1,125', '4,375', '162.5', '115', '−53.75', '0', '5,351', '75', '5,426', '5,425']],
+      ['Saad', ['27', '3,812', '2,499', '−1,313', '1,125', '3,750 F', '162.5', '115', '−68.75', '0', '3,771', '75', '3,846', '3,845']],
+      ['Alif', ['22.5', '1,186', '2,082', '896', '1,125', '4,375', '162.5', '115', '61.25', '0', '6,735', '75', '6,810', '6,810']],
+      ['Asif', ['30.5', '2,031', '2,823', '792', '1,125', '3,000 F', '162.5', '115', '61.25', '0', '5,256', '75', '5,331', '5,330']]
+    ];
+    const T = ['103.5', '9,577', '9,579', '2', '4,500', '15,500', '650', '460', '0', '0', '21,113', '300', '21,413', '21,410'];
+    const cell = (v, i) => ({ v, c: v.charAt(0) === '−' ? '#5AA9FF' : i === 13 ? '#22E07A' : '#E8F0EC', w: i >= 12 ? '600' : '400' });
+    const tagC = { MEAL: '#22E07A', BAZAR: '#5AA9FF', PAY: '#F5B83D', BILL: '#C9A7FF' };
+    return {
+      nav: N.map(([label, d, href]) => {
+        const on = label === 'Report';
+        return { label, d, href, cur: on ? 'page' : 'false', color: on ? '#22E07A' : '#B6C3BC', bg: on ? 'rgba(34,224,122,0.08)' : 'transparent', border: on ? 'rgba(34,224,122,0.25)' : 'transparent' };
+      }),
+      stats: [
+        { k: 'MEAL RATE', v: '৳92.53', n: '9,577 ÷ 103.5' }, { k: 'TOTAL MEALS', v: '103.5', n: '4 active members' },
+        { k: 'TOTAL BAZAR', v: '৳9,577', n: '৳2,394.25 / head' }, { k: 'MEAL COST', v: '৳9,579', n: 'Σ ceil per member' },
+        { k: 'INITIAL', v: '৳245', n: '৳61.25 / head' }, { k: 'KHALA DAYS', v: '24', n: 'days anyone ate' }
+      ],
+      cols: K.map((k, i) => ({ k, color: i === 13 ? '#22E07A' : '#8A9A92' })),
+      rows: R.map(([name, vals]) => ({ name, cells: vals.map(cell) })),
+      tot: T.map((v, i) => ({ v, c: i === 13 ? '#22E07A' : '#E8F0EC' })),
+      bills: [
+        { k: 'Khala', v: '4,500', p: '1,125 each' }, { k: 'House rent', v: '15,500', p: 'F + 4,375' },
+        { k: 'Wifi', v: '650', p: '162.5 each' }, { k: 'Gas', v: '460', p: '115 each' }, { k: 'Extra', v: '300', p: '75 each' }
+      ],
+      highs: [
+        { k: 'Most meals', v: 'Asif · 30.5' }, { k: 'Top bazar (amount)', v: 'Saad · ৳3,812' }, { k: 'Most bazar trips', v: 'Saad · 10' },
+        { k: 'Top initial', v: 'Saad · ৳130' }, { k: 'Most total spend', v: 'Saad · ৳3,942' }
+      ],
+      log: [
+        ['21:04:12', 'MEAL', 'Asif +1.5 (31 Oct)'], ['20:51:40', 'MEAL', 'Ayman +2 (31 Oct)'], ['19:40:55', 'BAZAR', 'Saad ৳230 murgi'],
+        ['19:40:55', 'BAZAR', 'Saad ৳90 chal+milk'], ['17:12:03', 'PAY', 'Alif ৳2,000 bkash'], ['16:30:22', 'BILL', 'gas ৳460'], ['14:05:09', 'MEAL', 'Saad −0.5 (30 Oct)']
+      ].map(([t, tag, msg]) => ({ t, tag, msg, c: tagC[tag] }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{"v":3,"createdOnFiles":{"v":1,"at":"2026-10-30T12:00:00Z"},"title":"Light House – Mess Meal Manager","launch":{"view":"canvas"},"pages":[],
+"boards":{
+"Main.dc.html":{"x":0,"y":0,"w":390,"h":844,"title":"Phone · Today","is_interactive":true,"radius":44},
+"Phone-Meals.dc.html":{"x":470,"y":0,"w":390,"h":844,"title":"Phone · Meals","is_interactive":true,"radius":44},
+"Phone-Bazar.dc.html":{"x":940,"y":0,"w":390,"h":844,"title":"Phone · Add bazar","is_interactive":true,"radius":44},
+"Phone-Report.dc.html":{"x":1410,"y":0,"w":390,"h":1100,"title":"Phone · Report","is_interactive":true,"radius":44},
+"Phone-Close.dc.html":{"x":1880,"y":0,"w":390,"h":1060,"title":"Phone · Close month + log","is_interactive":true,"radius":44},
+"Web-Report.dc.html":{"x":0,"y":1520,"w":1440,"h":1240,"title":"Web · Report","expand":"fill","is_interactive":true},
+"Web-Status.dc.html":{"x":1520,"y":1520,"w":1280,"h":1560,"title":"Web · Status","expand":"fill","is_interactive":true}
+},
+"order":["Main.dc.html","Phone-Meals.dc.html","Phone-Bazar.dc.html","Phone-Report.dc.html","Phone-Close.dc.html","Web-Report.dc.html","Web-Status.dc.html"],
+"notes":{
+"phoneTitle":{"x":0,"y":-300,"text":"Phone app (Android · PWA)","kind":"title1","maxW":2270},
+"webTitle":{"x":0,"y":1220,"text":"Web app","kind":"title1","maxW":2800}
+},
+"designSystems":[]}
