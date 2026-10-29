@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Light House · Close month</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050807}
+a{color:#22E07A}a:hover{color:#5BF09E}
+.g{background:rgba(255,255,255,0.04);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.10)}
+.m{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s cubic-bezier(.2,.8,.2,1)}
+button:active{transform:scale(0.97)}
+button:focus-visible,a:focus-visible{outline:2px solid #22E07A;outline-offset:2px}
+@media (prefers-reduced-transparency:reduce){.g{background:#0E1411;-webkit-backdrop-filter:none;backdrop-filter:none}}
+@media (prefers-contrast:more){.g{background:#0E1411;border-color:rgba(255,255,255,0.4)}}
+@media (prefers-reduced-motion:reduce){button,button:active{transition:none;transform:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 1060px; overflow: hidden; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: #E8F0EC; background: radial-gradient(120% 35% at 50% -6%, rgba(34,224,122,0.12), rgba(34,224,122,0) 62%), #050807">
+<main style="display: flex; flex-direction: column; gap: 14px; padding: 22px 16px 0">
+
+<header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 4px 4px 2px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="m" style="font-size: 11px; letter-spacing: 0.14em; color: #8A9A92">MORE · OCTOBER 2026</span>
+<h1 style="margin: 0; font-size: 30px; line-height: 1.05; letter-spacing: -0.02em; font-weight: 650">Close month</h1>
+</div>
+<span class="m" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(34,224,122,0.35); font-size: 11px; letter-spacing: 0.08em; color: #22E07A"><span style="width: 6px; height: 6px; border-radius: 50%; background: #22E07A; box-shadow: 0 0 8px #22E07A"></span>OPEN</span>
+</header>
+
+<ol aria-label="Close month steps" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+<li style="display: flex; flex-direction: column">
+<sc-if value="{{s.line}}" hint-placeholder-val="{{true}}">
+<span aria-hidden="true" style="width: 2px; height: 12px; margin-left: 35px; background: {{s.lineColor}}"></span>
+</sc-if>
+<div class="g" style="border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; border-color: {{s.cardBorder}}">
+<span aria-hidden="true" style="flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid {{s.ring}}; display: grid; place-items: center; color: {{s.ring}}; box-shadow: 0 0 14px {{s.glow}}">
+<sc-if value="{{s.done}}" hint-placeholder-val="{{true}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</sc-if>
+<sc-if value="{{s.cur}}" hint-placeholder-val="{{false}}">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #F5B83D; box-shadow: 0 0 10px #F5B83D"></span>
+</sc-if>
+</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 15px; font-weight: 650; letter-spacing: 0.02em">{{s.title}}</span>
+<span class="m" style="font-size: 11px; line-height: 1.45; color: #8A9A92">{{s.sub}}</span>
+</div>
+<span class="m" style="flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; border: 1px solid {{s.pillBorder}}; font-size: 10px; letter-spacing: 0.08em; color: {{s.pillColor}}"><span style="width: 5px; height: 5px; border-radius: 50%; background: {{s.pillColor}}"></span>{{s.pill}}</span>
+</div>
+</li>
+</sc-for>
+</ol>
+
+<button style="height: 56px; border-radius: 16px; border: 1px solid rgba(34,224,122,0.6); background: rgba(34,224,122,0.08); color: #22E07A; font-size: 16px; font-weight: 650; letter-spacing: 0.04em; box-shadow: 0 0 28px rgba(34,224,122,0.18)">Review &amp; close October</button>
+<p style="margin: -4px 0 0; padding: 0 4px; font-size: 12px; line-height: 1.5; color: #8A9A92">Closing saves a snapshot, opens November and carries each balance forward as previous due. A manager can reopen with a reason; it is logged.</p>
+
+<section class="g" aria-label="Activity log" style="border-radius: 16px; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22E07A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+<span class="m" style="font-size: 12px; letter-spacing: 0.12em; font-weight: 600">ACTIVITY LOG</span>
+<span class="m" style="margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.1em; color: #22E07A"><span style="width: 5px; height: 5px; border-radius: 50%; background: #22E07A; box-shadow: 0 0 6px #22E07A"></span>LIVE</span>
+</div>
+<div class="m" role="log" aria-live="polite" style="display: flex; flex-direction: column; padding: 6px 0; font-size: 11.5px">
+<sc-for list="{{log}}" as="l" hint-placeholder-count="7">
+<div style="display: grid; grid-template-columns: 62px 50px 1fr; gap: 6px; padding: 5px 14px; align-items: baseline">
+<span style="color: #6F7F78">{{l.t}}</span>
+<span style="color: {{l.c}}; letter-spacing: 0.06em">{{l.tag}}</span>
+<span style="color: #D5E0DA; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.msg}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+</main>
+
+<nav class="g" aria-label="Primary" style="position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 8px 6px 26px; border-radius: 0; border-left: 0; border-right: 0; border-bottom: 0; background: rgba(8,12,10,0.72)">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="{{t.href}}" aria-current="{{t.cur}}" style="display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 48px; padding-top: 4px; text-decoration: none; font-size: 11px; color: {{t.color}}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.d}}"></path></svg>
+<span>{{t.label}}</span>
+<span style="width: 4px; height: 4px; border-radius: 50%; background: {{t.dot}}; box-shadow: 0 0 8px {{t.dot}}"></span>
+</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1060}}'>
+class Component extends DCLogic {
+  tabs(active) {
+    const T = [
+      ['Today', 'Main.dc.html', 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4'],
+      ['Meals', 'Phone-Meals.dc.html', 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z'],
+      ['Bazar', 'Phone-Bazar.dc.html', 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0'],
+      ['Report', 'Phone-Report.dc.html', 'M3 3v18h18M8 16v-4M13 16V8M18 16v-7'],
+      ['More', 'Phone-Close.dc.html', 'M4 6h16M4 12h16M4 18h16']
+    ];
+    return T.map(([label, href, d]) => ({ label, href, d, cur: label === active ? 'page' : 'false', color: label === active ? '#22E07A' : '#8A9A92', dot: label === active ? '#22E07A' : 'transparent' }));
+  }
+  renderVals() {
+    const S = [
+      ['done', 'MEALS', '103.5 meals · 4 members · 24 khala days', 'DONE'],
+      ['done', 'BAZAR', '৳9,577 bazar · ৳245 initial · items sum match', 'DONE'],
+      ['done', 'BILLS', 'khala 4,500 · rent 15,500 · wifi 650 · gas 460 · extra 300', 'DONE'],
+      ['cur', 'REVIEW', 'Σ settled ৳21,410 · rounding −3 vs sheet', 'PENDING'],
+      ['wait', 'CLOSED', 'snapshot · open Nov 2026 · carry dues', 'WAITING']
+    ];
+    const tone = {
+      done: { ring: '#22E07A', glow: 'rgba(34,224,122,0.25)', pill: '#22E07A', pb: 'rgba(34,224,122,0.4)', card: 'rgba(34,224,122,0.22)' },
+      cur: { ring: '#F5B83D', glow: 'rgba(245,184,61,0.22)', pill: '#F5B83D', pb: 'rgba(245,184,61,0.45)', card: 'rgba(245,184,61,0.30)' },
+      wait: { ring: '#56645E', glow: 'transparent', pill: '#8A9A92', pb: 'rgba(255,255,255,0.14)', card: 'rgba(255,255,255,0.08)' }
+    };
+    const tagC = { MEAL: '#22E07A', BAZAR: '#5AA9FF', PAY: '#F5B83D', BILL: '#C9A7FF' };
+    const L = [
+      ['21:04:12', 'MEAL', 'Asif +1.5 (31 Oct)'], ['20:51:40', 'MEAL', 'Ayman +2 (31 Oct)'],
+      ['19:40:55', 'BAZAR', 'Saad ৳230 murgi'], ['19:40:55', 'BAZAR', 'Saad ৳90 chal+milk'],
+      ['17:12:03', 'PAY', 'Alif ৳2,000 bkash'], ['16:30:22', 'BILL', 'gas ৳460'],
+      ['14:05:09', 'MEAL', 'Saad −0.5 (30 Oct)']
+    ];
+    return {
+      steps: S.map(([st, title, sub, pill], i) => {
+        const t = tone[st];
+        return {
+          title, sub, pill, done: st === 'done', cur: st === 'cur', line: i > 0,
+          lineColor: st === 'wait' ? 'rgba(255,255,255,0.12)' : 'rgba(34,224,122,0.5)',
+          ring: t.ring, glow: t.glow, pillColor: t.pill, pillBorder: t.pb, cardBorder: t.card
+        };
+      }),
+      log: L.map(([t, tag, msg]) => ({ t, tag, msg, c: tagC[tag] })),
+      tabs: this.tabs('More')
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Light House · Status</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050807}
+a{color:#22E07A}a:hover{color:#5BF09E}
+.g{background:rgba(255,255,255,0.04);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.10)}
+.m{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer;transition:transform .12s cubic-bezier(.2,.8,.2,1)}
+button:active{transform:scale(0.97)}
+button:focus-visible,a:focus-visible{outline:2px solid #22E07A;outline-offset:2px}
+@media (prefers-reduced-transparency:reduce){.g{background:#0E1411;-webkit-backdrop-filter:none;backdrop-filter:none}}
+@media (prefers-contrast:more){.g{background:#0E1411;border-color:rgba(255,255,255,0.4)}}
+@media (prefers-reduced-motion:reduce){button,button:active{transition:none;transform:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; padding: 32px 20px 56px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: #E8F0EC; background: radial-gradient(60% 30% at 50% -6%, rgba(34,224,122,0.14), rgba(34,224,122,0) 65%), #050807">
+<div style="max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<a href="Web-Report.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #8A9A92; text-decoration: none">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>Back to app</a>
+<span class="m" style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: 0.12em; color: #8A9A92"><span style="color: #E8F0EC; font-weight: 600">LIGHT HOUSE</span> | CI/CD STATUS</span>
+</div>
+
+<header style="display: flex; flex-direction: column; gap: 10px; padding: 8px 0 4px">
+<h1 style="margin: 0; font-size: 40px; line-height: 1.05; letter-spacing: -0.025em; font-weight: 650">All systems healthy</h1>
+<p class="m" style="margin: 0; font-size: 13px; color: #8A9A92">main@[sha] · deployed by deploy.yml · checked every 30 s</p>
+</header>
+
+<ol aria-label="Pipeline" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<sc-for list="{{cards}}" as="c" hint-placeholder-count="5">
+<li style="display: flex; flex-direction: column">
+<sc-if value="{{c.line}}" hint-placeholder-val="{{true}}">
+<span aria-hidden="true" style="width: 2px; height: 14px; margin-left: 41px; background: rgba(34,224,122,0.5)"></span>
+</sc-if>
+<div class="g" style="border-radius: 18px; padding: 16px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; border-color: rgba(34,224,122,0.28)">
+<span aria-hidden="true" style="flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #22E07A; color: #22E07A; display: grid; place-items: center; box-shadow: 0 0 16px rgba(34,224,122,0.25)">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.d}}"></path></svg>
+</span>
+<div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 17px; font-weight: 650; letter-spacing: 0.02em">{{c.title}}</span>
+<span class="m" style="font-size: 12px; color: #8A9A92">{{c.sub}}</span>
+</div>
+<span class="m" style="padding: 3px 8px; border-radius: 4px; border: 1px solid {{c.tagB}}; color: {{c.tagC}}; font-size: 10px; letter-spacing: 0.1em">{{c.tag}}</span>
+<span class="m" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(34,224,122,0.45); font-size: 11px; letter-spacing: 0.08em; color: #22E07A"><span style="width: 6px; height: 6px; border-radius: 50%; background: #22E07A; box-shadow: 0 0 8px #22E07A"></span>{{c.pill}}</span>
+</div>
+</li>
+</sc-for>
+</ol>
+
+<section class="g" aria-label="Live health response" style="border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22E07A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0zM2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"></path></svg>
+<h2 class="m" style="margin: 0; font-size: 13px; letter-spacing: 0.12em; font-weight: 600; color: #22E07A">LIVE HEALTH RESPONSE</h2>
+<button style="margin-left: auto; height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: transparent; font-size: 12px; display: inline-flex; align-items: center; gap: 6px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"></path></svg>Ping</button>
+</div>
+<p class="m" style="margin: 0; font-size: 13px; color: #B6C3BC; overflow-wrap: anywhere">POST /rest/v1/rpc/health → <span style="color: #22E07A">200 OK</span> · [latency] ms</p>
+<pre class="m" style="margin: 0; padding: 18px 20px; border-radius: 12px; border: 1px solid rgba(34,224,122,0.25); background: rgba(0,0,0,0.35); font-size: 18px; line-height: 1.6; overflow-x: auto">{
+  <span style="color: #5AA9FF">"status"</span>: <span style="color: #22E07A">"healthy"</span>,
+  <span style="color: #5AA9FF">"version"</span>: <span style="color: #F5B83D">"[latest migration]"</span>
+}</pre>
+<p style="margin: 0; font-size: 12px; color: #8A9A92">version = the newest applied migration; the web build’s commit lives in /version.json.</p>
+</section>
+
+<section class="g" aria-label="Pipeline log" style="border-radius: 18px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06)">
+<h2 class="m" style="margin: 0; font-size: 13px; letter-spacing: 0.12em; font-weight: 600">PIPELINE LOG</h2>
+<span class="m" style="margin-left: auto; font-size: 11px; color: #8A9A92">G = gate on every PR · D = deploy on main</span>
+</div>
+<div style="overflow-x: auto">
+<div class="m" role="log" style="min-width: 640px; padding: 8px 0; font-size: 12.5px">
+<sc-for list="{{log}}" as="l" hint-placeholder-count="10">
+<div style="display: grid; grid-template-columns: 40px 110px 1fr 56px; gap: 10px; padding: 6px 20px; align-items: baseline">
+<span style="color: #6F7F78">{{l.id}}</span>
+<span style="color: {{l.c}}; letter-spacing: 0.06em">{{l.name}}</span>
+<span style="color: #D5E0DA">{{l.msg}}</span>
+<span style="color: #22E07A; text-align: right">PASS</span>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1560}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const C = [
+      ['APP BUILD', 'main@[sha] · built [time] · version.json matches', 'REAL', 'LIVE', 'M3 4h18v6H3zM3 14h18v6H3zM7 7h.01M7 17h.01'],
+      ['DATABASE', 'health() 200 · [latency] ms · ap-south-1', 'REAL', 'HEALTHY', 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3'],
+      ['REALTIME', 'subscribed · filtered by mess_id', 'REAL', 'CONNECTED', 'M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a15 15 0 0 1 20 0M12 19.5h.01'],
+      ['LAST DEPLOY', 'deploy.yml · run #[n] · D1–D4 green', 'GITHUB', 'PASSED', 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 12h6M15 12h6'],
+      ['ANDROID BUILD', 'build-[n] · signed release APK', 'RELEASE', 'READY', 'M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2']
+    ];
+    const L = [
+      ['G1', 'STATIC', 'prettier · eslint 0 warnings · tsc · gitleaks · npm audit high', '#5AA9FF'],
+      ['G2', 'UNIT', 'vitest · calc coverage ≥ 95% · golden Oct-2026 fixture', '#5AA9FF'],
+      ['G3', 'DATABASE', 'db reset · db lint · pgTAP RLS · types drift 0', '#5AA9FF'],
+      ['G4', 'BUILD', 'vite build · initial route ≤ 250 KB gzip', '#5AA9FF'],
+      ['G5', 'E2E', 'playwright mobile + desktop · realtime < 3 s', '#5AA9FF'],
+      ['G6', 'LIGHTHOUSE', 'perf ≥ 85 · a11y ≥ 95 · best-practices ≥ 90 · PWA', '#5AA9FF'],
+      ['D1', 'DB PUSH', 'link · push --dry-run logged · push', '#F5B83D'],
+      ['D2', 'PAGES', 'deploy-pages · prod env', '#F5B83D'],
+      ['D3', 'SMOKE', 'version.json = sha · rpc(health) healthy', '#F5B83D'],
+      ['D4', 'ANDROID', 'capacitor signed APK → release build-[n]', '#F5B83D']
+    ];
+    return {
+      cards: C.map(([title, sub, tag, pill, d], i) => ({
+        title, sub, tag, pill, d, line: i > 0,
+        tagB: tag === 'REAL' ? 'rgba(90,169,255,0.5)' : 'rgba(245,184,61,0.5)',
+        tagC: tag === 'REAL' ? '#5AA9FF' : '#F5B83D'
+      })),
+      log: L.map(([id, name, msg, c]) => ({ id, name, msg, c }))
+    };
+  }
+}
+</script>
+</body>
+</html>
