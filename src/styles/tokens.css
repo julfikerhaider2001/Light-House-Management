@@ -1006,3 +1006,323 @@ button {
   letter-spacing: 0.3em;
   color: var(--accent);
 }
+
+/* ---------- Forms (extended) ---------- */
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.segmented {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.segmented__opt {
+  min-height: 40px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: transform 100ms ease-out;
+}
+
+.segmented__opt:active {
+  transform: scale(0.96);
+}
+
+.segmented__opt[aria-checked='true'] {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+  background: rgba(34, 224, 122, 0.08);
+}
+
+.items {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.items legend {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  padding: 0 0 6px;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr 96px 44px;
+  gap: 8px;
+  align-items: center;
+}
+
+.file-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px dashed var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.file-btn:focus-within {
+  outline: 2px solid var(--accent);
+}
+
+/* ---------- Expense / payment rows ---------- */
+
+.expense {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 8px 2px;
+}
+
+.expense__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.expense__main .small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Report ---------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.toolbar select {
+  width: auto;
+  min-height: 40px;
+  padding: 6px 10px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px 12px;
+  margin: 0;
+}
+
+.stats-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stats-grid dd {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.pad-x {
+  padding: 0 18px;
+}
+
+.report-table td {
+  padding: 10px 12px;
+  text-align: right;
+}
+
+.report-table .sticky {
+  padding: 10px 12px;
+  color: var(--text);
+}
+
+.kv-list {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.kv-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.kv-list dt {
+  color: var(--text-2);
+}
+
+.kv-list dd {
+  margin: 0;
+}
+
+/* ---------- Close stepper ---------- */
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+}
+
+/* Connector line between stepper cards. */
+.steps::before {
+  content: '';
+  position: absolute;
+  left: 31px;
+  top: 24px;
+  bottom: 24px;
+  width: 1px;
+  background: var(--glass-border);
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+}
+
+.step__mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--solid);
+  color: var(--text-2);
+  font-size: 0.75rem;
+  flex: none;
+}
+
+.step--done .step__mark {
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(34, 224, 122, 0.35);
+}
+
+.step--current {
+  border-color: var(--accent-soft);
+}
+
+.step__action {
+  margin-left: auto;
+}
+
+/* ---------- Activity log ---------- */
+
+.log-card {
+  padding: 12px 14px;
+}
+
+.log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.8125rem;
+  max-height: 70dvh;
+  overflow: auto;
+}
+
+.log__row {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.log__row:first-child {
+  border-top: 0;
+}
+
+.log__msg {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Print (report → PDF) ---------- */
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .tabbar,
+  .sidebar,
+  .no-print,
+  .toasts {
+    display: none !important;
+  }
+
+  .content {
+    margin: 0;
+    width: 100%;
+    padding: 0;
+  }
+
+  .glass {
+    background: none;
+    border: 1px solid #ccc;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .grid-scroll {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .grid thead th,
+  .grid .sticky,
+  .grid tfoot td,
+  .grid tfoot th {
+    position: static;
+    background: none;
+    color: #000;
+  }
+
+  .muted,
+  .eyebrow,
+  .money--due,
+  .money--credit,
+  .pill {
+    color: #000;
+  }
+}
