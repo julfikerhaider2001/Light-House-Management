@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation } from 'react-router';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button, Card, Field } from '../components/ui';
 import { t } from '../i18n';
 import { signIn, signUp, useSession } from '../lib/api/session';
@@ -15,6 +16,7 @@ export default function AuthPage() {
   const [name, setName] = useState('');
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
+  const [reveal, setReveal] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const from = (location.state as { from?: string } | null)?.from ?? '/';
@@ -80,15 +82,30 @@ export default function AuthPage() {
             error={show('password')}
             hint={t('auth.passwordHint')}
           >
-            <input
-              id="password"
-              type="password"
-              autoComplete={mode === 'signUp' ? 'new-password' : 'current-password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onBlur={() => setTouched((s) => ({ ...s, password: true }))}
-              aria-invalid={Boolean(show('password'))}
-            />
+            <div className="input-affix">
+              <input
+                id="password"
+                type={reveal ? 'text' : 'password'}
+                autoComplete={mode === 'signUp' ? 'new-password' : 'current-password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => setTouched((s) => ({ ...s, password: true }))}
+                aria-invalid={Boolean(show('password'))}
+              />
+              <button
+                type="button"
+                className="input-affix__btn"
+                aria-label={reveal ? t('auth.hidePassword') : t('auth.showPassword')}
+                aria-pressed={reveal}
+                onClick={() => setReveal(!reveal)}
+              >
+                {reveal ? (
+                  <EyeOff size={18} strokeWidth={1.5} aria-hidden="true" />
+                ) : (
+                  <Eye size={18} strokeWidth={1.5} aria-hidden="true" />
+                )}
+              </button>
+            </div>
           </Field>
           {serverError ? (
             <p className="form__error" role="alert">

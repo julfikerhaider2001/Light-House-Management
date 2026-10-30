@@ -34,7 +34,8 @@ export default defineConfig({
     versionJson(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'script-defer',
+      // Registered from main.tsx so a new deploy reloads open pages instead of serving the old shell.
+      injectRegister: false,
       includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'offline.html'],
       manifest: {
         id: BASE,

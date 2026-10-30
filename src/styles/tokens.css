@@ -1396,3 +1396,167 @@ button {
 .json__err {
   color: var(--due);
 }
+
+/* ---------- Input with trailing button (show password) ---------- */
+
+.input-affix {
+  position: relative;
+}
+
+.input-affix input {
+  padding-right: 52px;
+}
+
+.input-affix__btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 48px;
+  height: 100%;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  border-radius: 0 12px 12px 0;
+}
+
+.input-affix__btn[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+/* ---------- Floating action button (thumb reach, above the tab bar) ---------- */
+
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: rgba(14, 20, 17, 0.88);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 0 18px rgba(34, 224, 122, 0.3);
+  cursor: pointer;
+  transition: transform 100ms ease-out;
+}
+
+.fab:active {
+  transform: scale(0.96);
+}
+
+@media (min-width: 900px) {
+  .fab {
+    bottom: 28px;
+    right: max(28px, calc((100vw - var(--sidebar-w) - 760px) / 2 + 28px));
+  }
+}
+
+/* Leave room so the last list row isn't hidden behind the FAB. */
+.has-fab {
+  padding-bottom: 72px;
+}
+
+/* ---------- Members ---------- */
+
+.member-row {
+  min-height: 60px;
+}
+
+.member-row__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.member-row__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-row__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.member-row--invited .avatar {
+  border-style: dashed;
+}
+
+.member-row--left {
+  opacity: 0.6;
+}
+
+.icon-btn--outline {
+  border: 1px solid var(--glass-border);
+  flex: none;
+  transition: transform 100ms ease-out;
+}
+
+.icon-btn--outline:active {
+  transform: scale(0.94);
+}
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 100ms ease-out;
+}
+
+.action-btn svg {
+  color: var(--accent);
+  flex: none;
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+}
+
+.action-btn__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-btn--danger {
+  border-color: rgba(255, 92, 92, 0.4);
+}
+
+.action-btn--danger svg,
+.action-btn--danger strong {
+  color: var(--due);
+}

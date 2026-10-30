@@ -56,18 +56,8 @@ export default function BazarPage() {
       <PageHeader
         eyebrow={`${formatMonth(b.period.month).toUpperCase()} · ${taka(total, 0)}`}
         title={t('bazar.title')}
-        aside={
-          open ? (
-            <Button variant="primary" onClick={() => setAdding(true)}>
-              <span className="row">
-                <Plus size={18} strokeWidth={1.5} aria-hidden="true" />
-                {t('bazar.add')}
-              </span>
-            </Button>
-          ) : null
-        }
       />
-      <Card aria-label={t('bazar.title')}>
+      <Card aria-label={t('bazar.title')} className={open ? 'has-fab' : ''}>
         {list.length === 0 ? (
           <EmptyState>{t('bazar.empty')}</EmptyState>
         ) : (
@@ -107,6 +97,12 @@ export default function BazarPage() {
           </div>
         )}
       </Card>
+      {open && !adding ? (
+        <button type="button" className="fab" onClick={() => setAdding(true)}>
+          <Plus size={20} strokeWidth={1.75} aria-hidden="true" />
+          {t('bazar.add')}
+        </button>
+      ) : null}
       <Sheet open={adding} title={t('bazar.addTitle')} onClose={() => setAdding(false)}>
         {adding ? (
           <ExpenseForm

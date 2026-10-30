@@ -1,9 +1,19 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Copy, RefreshCw, Share2, UserPlus } from 'lucide-react';
+import {
+  Copy,
+  MoreHorizontal,
+  RefreshCw,
+  Share2,
+  ShieldCheck,
+  UserCheck,
+  UserMinus,
+  UserPlus,
+} from 'lucide-react';
+import { Sheet } from '../components/Sheet';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../components/toast-context';
-import { Button, Card, Field, PageHeader, Spinner, StatusPill, Tag } from '../components/ui';
-import { t } from '../i18n';
+import { Button, Card, Field, PageHeader, Spinner, Tag } from '../components/ui';
+import { t, type MessageKey } from '../i18n';
 import { useBundle } from '../lib/api/bundle';
 import { useCurrentMess } from '../lib/api/current';
 import type { Member } from '../lib/api/schemas';
@@ -43,12 +53,19 @@ export default function MembersPage() {
   const add = useMessMutation(messId, addMember);
   const [name, setName] = useState('');
   const [touched, setTouched] = useState(false);
+  const [managing, setManaging] = useState<Member | null>(null);
 
   if (bundle.isPending) return <Spinner label={t('common.loading')} />;
   const b = bundle.data;
   if (!b) return <PageHeader eyebrow="" title={t('members.title')} />;
 
   const url = joinUrl(b.mess.invite_code);
+  // Joined members first, then invites nobody has claimed yet, then people who left.
+  const groups: ['joined' | 'invited' | 'left', Member[]][] = [
+    ['joined', b.members.filter((m) => m.status === 'active' && m.user_id !== null)],
+    ['invited', b.members.filter((m) => m.status === 'active' && m.user_id === null)],
+    ['left', b.members.filter((m) => m.status === 'left')],
+  ];
   const refresh = () => qc.invalidateQueries({ queryKey: ['bundle', messId] });
 
   const update = async (m: Member, patch: Partial<Pick<Member, 'role' | 'status' | 'left_on'>>) => {
@@ -140,55 +157,119 @@ export default function MembersPage() {
         </div>
       </Card>
 
-      <Card aria-label={t('members.title')}>
-        <ul className="list" role="list">
-          {b.members.map((m) => (
-            <li key={m.id} className="list-row">
-              <span className="avatar mono" aria-hidden="true">
-                {initials(m.display_name)}
-              </span>
-              <span className="list-row__name">
-                {m.display_name}
-                {m.id === memberId ? <Tag>{t('common.you')}</Tag> : null}
-                {m.role === 'manager' ? <Tag tone="info">{t('common.manager')}</Tag> : null}
-              </span>
-              {m.user_id === null ? (
-                <StatusPill tone="warn">{t('members.placeholder')}</StatusPill>
-              ) : null}
-              {m.status === 'left' ? (
-                <StatusPill tone="idle">{t('members.left')}</StatusPill>
-              ) : null}
-              {isManager && m.id !== memberId ? (
-                <span className="row">
-                  <Button
-                    onClick={() =>
-                      void update(m, { role: m.role === 'manager' ? 'member' : 'manager' })
-                    }
-                  >
-                    {m.role === 'manager'
-                      ? t('members.makeMember', { name: m.display_name })
-                      : t('members.makeManager', { name: m.display_name })}
-                  </Button>
-                  <Button
-                    onClick={() =>
-                      void update(
-                        m,
-                        m.status === 'active'
-                          ? { status: 'left', left_on: todayIn(b.mess.timezone) }
-                          : { status: 'active', left_on: null },
-                      )
-                    }
-                  >
-                    {m.status === 'active'
-                      ? t('members.markLeft', { name: m.display_name })
-                      : t('members.markActive', { name: m.display_name })}
-                  </Button>
+      {groups.map(([key, list]) =>
+        list.length ? (
+          <Card key={key} aria-labelledby={`members-${key}`}>
+            <div className="row-between">
+              <h2 id={`members-${key}`} className="h3">
+                {t(`members.group.${key}` as MessageKey)}
+              </h2>
+              <span className="mono muted small">{list.length}</span>
+            </div>
+            {key === 'invited' ? <p className="muted small">{t('members.invitedHint')}</p> : null}
+            <ul className="list" role="list">
+              {list.map((m) => (
+                <li key={m.id} className={`list-row member-row member-row--${key}`}>
+                  <span className="avatar mono" aria-hidden="true">
+                    {initials(m.display_name)}
+                  </span>
+                  <span className="member-row__text">
+                    <span className="member-row__name">{m.display_name}</span>
+                    <span className="member-row__chips">
+                      {m.id === memberId ? <Tag>{t('common.you')}</Tag> : null}
+                      {m.role === 'manager' ? <Tag tone="info">{t('common.manager')}</Tag> : null}
+                      {key === 'invited' ? (
+                        <span className="muted small">{t('members.notJoined')}</span>
+                      ) : null}
+                      {key === 'left' && m.left_on ? (
+                        <span className="muted small mono">
+                          {t('members.leftOn', { date: m.left_on })}
+                        </span>
+                      ) : null}
+                    </span>
+                  </span>
+                  {isManager && m.id !== memberId ? (
+                    <button
+                      type="button"
+                      className="icon-btn icon-btn--outline"
+                      aria-label={t('members.manage', { name: m.display_name })}
+                      onClick={() => setManaging(m)}
+                    >
+                      <MoreHorizontal size={18} strokeWidth={1.5} aria-hidden="true" />
+                    </button>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : null,
+      )}
+
+      <Sheet
+        open={managing !== null}
+        title={managing?.display_name ?? ''}
+        onClose={() => setManaging(null)}
+      >
+        {managing ? (
+          <div className="action-list">
+            {managing.user_id !== null && managing.status === 'active' ? (
+              <button
+                type="button"
+                className="action-btn"
+                onClick={() => {
+                  void update(managing, {
+                    role: managing.role === 'manager' ? 'member' : 'manager',
+                  });
+                  setManaging(null);
+                }}
+              >
+                <ShieldCheck size={20} strokeWidth={1.5} aria-hidden="true" />
+                <span className="action-btn__text">
+                  <strong>
+                    {managing.role === 'manager'
+                      ? t('members.makeMember')
+                      : t('members.makeManager')}
+                  </strong>
+                  <span className="muted small">
+                    {managing.role === 'manager'
+                      ? t('members.makeMemberHint')
+                      : t('members.makeManagerHint')}
+                  </span>
                 </span>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      </Card>
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className={`action-btn${managing.status === 'active' ? ' action-btn--danger' : ''}`}
+              onClick={() => {
+                void update(
+                  managing,
+                  managing.status === 'active'
+                    ? { status: 'left', left_on: todayIn(b.mess.timezone) }
+                    : { status: 'active', left_on: null },
+                );
+                setManaging(null);
+              }}
+            >
+              {managing.status === 'active' ? (
+                <UserMinus size={20} strokeWidth={1.5} aria-hidden="true" />
+              ) : (
+                <UserCheck size={20} strokeWidth={1.5} aria-hidden="true" />
+              )}
+              <span className="action-btn__text">
+                <strong>
+                  {managing.status === 'active' ? t('members.markLeft') : t('members.markActive')}
+                </strong>
+                <span className="muted small">
+                  {managing.status === 'active'
+                    ? t('members.markLeftHint')
+                    : t('members.markActiveHint')}
+                </span>
+              </span>
+            </button>
+          </div>
+        ) : null}
+      </Sheet>
 
       {isManager ? (
         <Card aria-labelledby="add-title">
