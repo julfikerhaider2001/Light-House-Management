@@ -68,8 +68,12 @@ export function useMessRealtime(messId: string | undefined) {
       }
       channel.subscribe((event) => {
         const state = String(event);
-        if (state === 'SUBSCRIBED') setStatus('connected');
-        else if (state === 'CHANNEL_ERROR' || state === 'TIMED_OUT') setStatus('error');
+        if (state === 'SUBSCRIBED') {
+          setStatus('connected');
+          // Catch up on anything written between the last fetch and this (re)subscription,
+          // e.g. a cold start or a phone waking from sleep.
+          refresh();
+        } else if (state === 'CHANNEL_ERROR' || state === 'TIMED_OUT') setStatus('error');
         else if (state === 'CLOSED') setStatus('idle');
       });
       cleanup = () => void sb.removeChannel(channel);
