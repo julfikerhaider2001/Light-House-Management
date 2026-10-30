@@ -144,6 +144,11 @@ export const en = {
     duesHint: 'Carried from last month when it was closed. Edit if needed.',
     readOnly: 'Only the manager can change bills.',
     saved: 'Saved',
+    changePassword: 'Change password',
+    newPassword: 'New password',
+    confirmPassword: 'Type it again',
+    passwordMismatch: 'The passwords do not match',
+    passwordChanged: 'Password changed',
   },
   payments: {
     title: 'Payments',
@@ -290,6 +295,11 @@ export const en = {
     phoneHint: 'bKash / Nagad number, so the mess knows where to send money',
     phoneInvalid: 'Enter a phone number like +8801712345678',
     saved: 'Saved',
+    changePassword: 'Change password',
+    newPassword: 'New password',
+    confirmPassword: 'Type it again',
+    passwordMismatch: 'The passwords do not match',
+    passwordChanged: 'Password changed',
   },
   settings: {
     title: 'Mess settings',
