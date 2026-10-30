@@ -18,7 +18,11 @@ test('two people share a mess and see meal changes live', async ({ browser }, in
   await expect(member.getByRole('heading', { name: 'Today', level: 1 })).toBeVisible();
 
   // Both open the month grid on the 1st (the manager can edit any day of an open month).
+  // The manager reloads once: on a freshly started local stack the first postgres_changes
+  // subscriber creates the replication slot and can miss events while it warms up (the join).
+  // The live path under test (manager edit → member screen, no reload) stays strict below.
   await manager.goto('./#/meals');
+  await manager.reload();
   await member.goto('./#/meals');
   const saadDay1 = (page: typeof manager) =>
     page.getByRole('button', { name: /^Saad, \w{3} 1 \w{3}: / });
