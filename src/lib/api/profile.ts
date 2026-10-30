@@ -10,6 +10,7 @@ const ProfileSchema = z.object({
   id: z.string(),
   display_name: z.string(),
   avatar_path: z.nullable(z.string()),
+  phone: z.nullable(z.string()),
 });
 export type Profile = z.infer<typeof ProfileSchema>;
 
@@ -23,7 +24,7 @@ export function useMyProfile(userId: string | undefined) {
       const sb = await getSupabase();
       const { data, error } = await sb
         .from('profiles')
-        .select('id, display_name, avatar_path')
+        .select('id, display_name, avatar_path, phone')
         .eq('id', userId ?? '')
         .single();
       if (error) throw error;

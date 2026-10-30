@@ -21,7 +21,7 @@ import {
 const QUICK = [0, 1, 1.5, 2, 3];
 
 export default function TodayPage() {
-  const { messId, memberId, isManager } = useCurrentMess();
+  const { messId, memberId } = useCurrentMess();
   const bundle = useBundle(messId);
   const report = useReport(bundle.data);
   const setMeal = useSetMeal(messId);
@@ -45,10 +45,11 @@ export default function TodayPage() {
   const tz = b.mess.timezone;
   const cutoff = b.mess.meal_cutoff_time;
   const today = todayIn(tz, new Date(now));
-  // Today's meals locked at last night's cutoff, so members plan for tomorrow.
+  // Members plan tomorrow's meals; the cutoff the night before is a reminder.
   const target = addDays(today, 1);
   const deadline = mealDeadline(target, cutoff, tz).getTime();
-  const locked = now >= deadline && !isManager;
+  // The cutoff is a reminder: anyone can still change any day while the month is open.
+  const pastCutoff = now >= deadline;
   const mine = mealsFor(b, memberId, target);
   const meRow = report?.members.find((m) => m.memberId === memberId);
   const rate = report?.overview.mealRate.toNumber() ?? 0;
@@ -95,7 +96,7 @@ export default function TodayPage() {
             size="lg"
             testId="my-meals"
             value={mine}
-            disabled={locked || !inMonth}
+            disabled={!inMonth}
             decLabel={t('today.removeHalf')}
             incLabel={t('today.addHalf')}
             onChange={(v) => change(memberId, v)}
@@ -111,18 +112,20 @@ export default function TodayPage() {
               type="button"
               className="quick__chip mono"
               aria-pressed={mine === q}
-              disabled={locked || !inMonth}
+              disabled={!inMonth}
               onClick={() => change(memberId, q)}
             >
               {mealCount(q)}
             </button>
           ))}
         </div>
-        <div className={`notice ${locked ? 'notice--due' : 'notice--warn'}`}>
+        <div className={`notice ${pastCutoff ? 'notice--info' : 'notice--warn'}`}>
           <span>
-            {locked ? t('today.locked') : t('today.locksAt', { time: cutoff.slice(0, 5) })}
+            {pastCutoff
+              ? t('today.pastCutoff', { time: cutoff.slice(0, 5) })
+              : t('today.locksAt', { time: cutoff.slice(0, 5) })}
           </span>
-          {!locked ? (
+          {!pastCutoff ? (
             <span className="mono notice__aside">{formatCountdown(deadline - now)}</span>
           ) : null}
         </div>
@@ -143,7 +146,7 @@ export default function TodayPage() {
         </Link>
       </div>
 
-      {isManager ? (
+      {members.length > 0 ? (
         <Card aria-labelledby="grid-title">
           <div className="row-between">
             <h2 id="grid-title" className="h3">

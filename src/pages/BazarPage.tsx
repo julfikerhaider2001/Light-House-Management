@@ -17,7 +17,7 @@ import { getSupabase } from '../lib/supabase';
 import { formatDay, formatMonth, todayIn } from '../lib/time';
 
 export default function BazarPage() {
-  const { messId, memberId, isManager } = useCurrentMess();
+  const { messId, memberId } = useCurrentMess();
   const bundle = useBundle(messId);
   const remove = useMessMutation(messId, setDeleted);
   const toast = useToast();
@@ -64,7 +64,7 @@ export default function BazarPage() {
           <div role="list" data-testid="expense-list">
             {list.map((e) => {
               const who = names.get(e.member_id) ?? '?';
-              const canDelete = open && (isManager || e.member_id === memberId);
+              const canDelete = open;
               return (
                 <div role="listitem" key={e.id}>
                   <SwipeRow
@@ -109,7 +109,6 @@ export default function BazarPage() {
             bundle={b}
             messId={messId}
             memberId={memberId}
-            isManager={isManager}
             onDone={() => setAdding(false)}
           />
         ) : null}
@@ -130,13 +129,11 @@ function ExpenseForm({
   bundle: b,
   messId,
   memberId,
-  isManager,
   onDone,
 }: {
   bundle: Bundle;
   messId: string;
   memberId: string;
-  isManager: boolean;
   onDone: () => void;
 }) {
   const save = useMessMutation(messId, addExpense);
@@ -235,12 +232,7 @@ function ExpenseForm({
           />
         </Field>
         <Field id="exp-payer" label={t('bazar.paidBy')}>
-          <select
-            id="exp-payer"
-            value={payer}
-            disabled={!isManager}
-            onChange={(e) => setPayer(e.target.value)}
-          >
+          <select id="exp-payer" value={payer} onChange={(e) => setPayer(e.target.value)}>
             {members.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.display_name}

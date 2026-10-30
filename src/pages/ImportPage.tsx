@@ -69,7 +69,7 @@ function diff(b: Bundle, parsed: ParsedSheet): Diff {
 }
 
 export default function ImportPage() {
-  const { messId, isManager } = useCurrentMess();
+  const { messId } = useCurrentMess();
   const bundle = useBundle(messId);
   const qc = useQueryClient();
   const toast = useToast();
@@ -179,23 +179,19 @@ export default function ImportPage() {
       <PageHeader eyebrow={month.toUpperCase()} title={t('import.title')} />
       <Card>
         <p className="muted small">{t('import.body')}</p>
-        {isManager ? (
-          <label className="file-btn">
-            <FileSpreadsheet size={18} strokeWidth={1.5} aria-hidden="true" />
-            <span>{reading ? t('import.reading') : t('import.choose')}</span>
-            <input
-              type="file"
-              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              className="sr-only"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void read(file);
-              }}
-            />
-          </label>
-        ) : (
-          <p className="notice notice--info">{t('import.managerOnly')}</p>
-        )}
+        <label className="file-btn">
+          <FileSpreadsheet size={18} strokeWidth={1.5} aria-hidden="true" />
+          <span>{reading ? t('import.reading') : t('import.choose')}</span>
+          <input
+            type="file"
+            accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void read(file);
+            }}
+          />
+        </label>
       </Card>
 
       {parsed && d ? (

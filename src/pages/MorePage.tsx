@@ -2,6 +2,8 @@ import { Link } from 'react-router';
 import {
   Activity,
   ChevronRight,
+  Settings,
+  UserRound,
   PlusCircle,
   ClipboardCheck,
   FileSpreadsheet,
@@ -19,11 +21,13 @@ import { useCurrentMess } from '../lib/api/current';
 import { signOut } from '../lib/api/session';
 
 const LINKS: { to: string; label: MessageKey; icon: LucideIcon }[] = [
+  { to: '/profile', label: 'nav.profile', icon: UserRound },
   { to: '/bills', label: 'nav.bills', icon: ReceiptText },
   { to: '/payments', label: 'nav.payments', icon: Wallet },
   { to: '/close', label: 'nav.close', icon: ClipboardCheck },
   { to: '/activity', label: 'nav.activity', icon: Activity },
   { to: '/members', label: 'nav.members', icon: Users },
+  { to: '/settings', label: 'nav.settings', icon: Settings },
   { to: '/onboarding', label: 'nav.anotherMess', icon: PlusCircle },
   { to: '/import', label: 'nav.import', icon: FileSpreadsheet },
   { to: '/status', label: 'nav.status', icon: Gauge },

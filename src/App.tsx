@@ -26,6 +26,8 @@ const ActivityPage = lazy(() => import('./pages/ActivityPage'));
 const MembersPage = lazy(() => import('./pages/MembersPage'));
 const ImportPage = lazy(() => import('./pages/ImportPage'));
 const StatusPage = lazy(() => import('./pages/StatusPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
 
 const loading = <Spinner label={t('common.loading')} />;
@@ -88,7 +90,8 @@ function InMess() {
   }
   if (memberships.isError) return <Navigate to="/auth" replace />;
 
-  const list = memberships.data;
+  // Deleted messes stay restorable from Profile → Mess settings but are hidden here.
+  const list = memberships.data.filter((m) => m.messes.deleted_at === null);
   const current = list.find((m) => m.mess_id === selected) ?? list[0];
   if (!current) return <OnboardingPage />;
 
@@ -121,6 +124,8 @@ function InMess() {
               <Route path="members" element={<MembersPage />} />
               <Route path="import" element={<ImportPage />} />
               <Route path="more" element={<MorePage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="settings" element={<SettingsPage />} />
               <Route path="onboarding" element={<OnboardingPage />} />
               <Route path="*" element={<PlaceholderPage />} />
             </Routes>

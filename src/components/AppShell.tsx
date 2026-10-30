@@ -7,6 +7,8 @@ import {
   ClipboardCheck,
   LayoutGrid,
   Menu,
+  Settings,
+  UserRound,
   ReceiptText,
   ShoppingBag,
   Users,
@@ -36,6 +38,8 @@ const SIDEBAR_EXTRA: NavItem[] = [
   { to: '/close', label: 'nav.close', icon: ClipboardCheck },
   { to: '/activity', label: 'nav.activity', icon: Activity },
   { to: '/members', label: 'nav.members', icon: Users },
+  { to: '/settings', label: 'nav.settings', icon: Settings },
+  { to: '/profile', label: 'nav.profile', icon: UserRound },
 ];
 
 function Item({ item, variant }: { item: NavItem; variant: 'tab' | 'side' }) {

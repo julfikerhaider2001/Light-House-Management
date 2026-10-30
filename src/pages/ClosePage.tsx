@@ -20,7 +20,7 @@ interface Step {
 }
 
 export default function ClosePage() {
-  const { messId, isManager } = useCurrentMess();
+  const { messId } = useCurrentMess();
   const bundle = useBundle(messId);
   const report = useReport(bundle.data);
   const close = useMessMutation(messId, closePeriod);
@@ -147,26 +147,22 @@ export default function ClosePage() {
               {s.detail ? <span className="muted small mono">{s.detail}</span> : null}
             </div>
             {s.key === 'review' && !closed ? (
-              isManager ? (
-                <Button
-                  variant="primary"
-                  className="step__action"
-                  disabled={!ready || close.isPending}
-                  onClick={doClose}
-                >
-                  {t('close.closeButton', { month })}
-                </Button>
-              ) : (
-                <span className="muted small step__action">{t('close.managerOnly')}</span>
-              )
+              <Button
+                variant="primary"
+                className="step__action"
+                disabled={!ready || close.isPending}
+                onClick={doClose}
+              >
+                {t('close.closeButton', { month })}
+              </Button>
             ) : null}
           </li>
         ))}
       </ol>
 
-      {closed && isManager ? <EmailReportCard bundle={b} report={report} /> : null}
+      {closed ? <EmailReportCard bundle={b} report={report} /> : null}
 
-      {closed && isManager ? (
+      {closed ? (
         <Card aria-labelledby="reopen-title">
           <h2 id="reopen-title" className="h3">
             {t('close.reopenTitle')}
