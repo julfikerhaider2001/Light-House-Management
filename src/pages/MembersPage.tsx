@@ -47,7 +47,7 @@ function InviteQr({ url, label }: { url: string; label: string }) {
 }
 
 export default function MembersPage() {
-  const { messId, memberId, isManager } = useCurrentMess();
+  const { messId, memberId } = useCurrentMess();
   const bundle = useBundle(messId);
   const qc = useQueryClient();
   const toast = useToast();
@@ -70,7 +70,15 @@ export default function MembersPage() {
   ];
   const refresh = () => qc.invalidateQueries({ queryKey: ['bundle', messId] });
 
-  const update = async (m: Member, patch: Partial<Pick<Member, 'role' | 'status' | 'left_on'>>) => {
+  const makeManager = async (m: Member) => {
+    const sb = await getSupabase();
+    const { error } = await sb.rpc('set_manager', { p_member: m.id });
+    if (error) toast.show(error.message, { tone: 'error' });
+    else toast.show(t('members.nowManager', { name: m.display_name }));
+    await refresh();
+  };
+
+  const update = async (m: Member, patch: Partial<Pick<Member, 'status' | 'left_on'>>) => {
     const sb = await getSupabase();
     const { error } = await sb.from('mess_members').update(patch).eq('id', m.id);
     if (error) toast.show(error.message, { tone: 'error' });
@@ -146,14 +154,12 @@ export default function MembersPage() {
                   {t('members.copy')}
                 </span>
               </Button>
-              {isManager ? (
-                <Button onClick={() => void rotate()}>
-                  <span className="row">
-                    <RefreshCw size={16} strokeWidth={1.5} aria-hidden="true" />
-                    {t('members.rotate')}
-                  </span>
-                </Button>
-              ) : null}
+              <Button onClick={() => void rotate()}>
+                <span className="row">
+                  <RefreshCw size={16} strokeWidth={1.5} aria-hidden="true" />
+                  {t('members.rotate')}
+                </span>
+              </Button>
             </div>
           </div>
         </div>
@@ -193,16 +199,14 @@ export default function MembersPage() {
                       ) : null}
                     </span>
                   </span>
-                  {isManager && m.id !== memberId ? (
-                    <button
-                      type="button"
-                      className="icon-btn icon-btn--outline"
-                      aria-label={t('members.manage', { name: m.display_name })}
-                      onClick={() => setManaging(m)}
-                    >
-                      <MoreHorizontal size={18} strokeWidth={1.5} aria-hidden="true" />
-                    </button>
-                  ) : null}
+                  <button
+                    type="button"
+                    className="icon-btn icon-btn--outline"
+                    aria-label={t('members.manage', { name: m.display_name })}
+                    onClick={() => setManaging(m)}
+                  >
+                    <MoreHorizontal size={18} strokeWidth={1.5} aria-hidden="true" />
+                  </button>
                 </li>
               ))}
             </ul>
@@ -217,29 +221,25 @@ export default function MembersPage() {
       >
         {managing ? (
           <div className="action-list">
-            {managing.user_id !== null && managing.status === 'active' ? (
+            {managing.user_id !== null &&
+            managing.status === 'active' &&
+            managing.role !== 'manager' ? (
               <button
                 type="button"
                 className="action-btn"
                 onClick={() => {
-                  void update(managing, {
-                    role: managing.role === 'manager' ? 'member' : 'manager',
-                  });
+                  void makeManager(managing);
                   setManaging(null);
                 }}
               >
                 <ShieldCheck size={20} strokeWidth={1.5} aria-hidden="true" />
                 <span className="action-btn__text">
                   <strong>
-                    {managing.role === 'manager'
-                      ? t('members.makeMember')
+                    {managing.id === memberId
+                      ? t('members.makeMeManager')
                       : t('members.makeManager')}
                   </strong>
-                  <span className="muted small">
-                    {managing.role === 'manager'
-                      ? t('members.makeMemberHint')
-                      : t('members.makeManagerHint')}
-                  </span>
+                  <span className="muted small">{t('members.makeManagerHint')}</span>
                 </span>
               </button>
             ) : null}
@@ -276,34 +276,28 @@ export default function MembersPage() {
         ) : null}
       </Sheet>
 
-      {isManager ? (
-        <Card aria-labelledby="add-title">
-          <h2 id="add-title" className="h3">
-            {t('members.add')}
-          </h2>
-          <p className="muted small">{t('members.addHint')}</p>
-          <form className="form form--inline" onSubmit={submit} noValidate>
-            <Field
+      <Card aria-labelledby="add-title">
+        <h2 id="add-title" className="h3">
+          {t('members.add')}
+        </h2>
+        <p className="muted small">{t('members.addHint')}</p>
+        <form className="form form--inline" onSubmit={submit} noValidate>
+          <Field id="new-member" label={t('members.name')} error={touched ? nameError : undefined}>
+            <input
               id="new-member"
-              label={t('members.name')}
-              error={touched ? nameError : undefined}
-            >
-              <input
-                id="new-member"
-                maxLength={60}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Field>
-            <Button type="submit" variant="primary" disabled={add.isPending}>
-              <span className="row">
-                <UserPlus size={16} strokeWidth={1.5} aria-hidden="true" />
-                {t('members.add')}
-              </span>
-            </Button>
-          </form>
-        </Card>
-      ) : null}
+              maxLength={60}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Field>
+          <Button type="submit" variant="primary" disabled={add.isPending}>
+            <span className="row">
+              <UserPlus size={16} strokeWidth={1.5} aria-hidden="true" />
+              {t('members.add')}
+            </span>
+          </Button>
+        </form>
+      </Card>
     </>
   );
 }

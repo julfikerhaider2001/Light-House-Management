@@ -87,7 +87,7 @@ function AmountInput({
 }
 
 export default function BillsPage() {
-  const { messId, isManager } = useCurrentMess();
+  const { messId } = useCurrentMess();
   const bundle = useBundle(messId);
   const report = useReport(bundle.data);
 
@@ -98,23 +98,22 @@ export default function BillsPage() {
   return (
     <>
       <PageHeader eyebrow={formatMonth(b.period.month).toUpperCase()} title={t('bills.title')} />
-      {!isManager ? <p className="notice notice--info">{t('bills.readOnly')}</p> : null}
       <BillsCard
         bundle={b}
         messId={messId}
-        editable={isManager && b.period.status === 'open'}
+        editable={b.period.status === 'open'}
         perHead={report.members[0]}
       />
       <MemberAmounts
         bundle={b}
         messId={messId}
-        editable={isManager && b.period.status === 'open'}
+        editable={b.period.status === 'open'}
         table="rent_shares"
       />
       <MemberAmounts
         bundle={b}
         messId={messId}
-        editable={isManager && b.period.status === 'open'}
+        editable={b.period.status === 'open'}
         table="previous_dues"
       />
     </>

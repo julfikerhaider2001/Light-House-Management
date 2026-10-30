@@ -154,6 +154,24 @@ export async function addPayment(
   if (error) throw error;
 }
 
+/** Correct a recorded payment (the member it belongs to stays fixed). */
+export async function updatePayment(
+  _messId: string,
+  input: { id: string; amount: number; method: PaymentMethod; date: string; note?: string },
+) {
+  const sb = await getSupabase();
+  const { error } = await sb
+    .from('payments')
+    .update({
+      amount: input.amount,
+      method: input.method,
+      date: input.date,
+      note: input.note ?? null,
+    })
+    .eq('id', input.id);
+  if (error) throw error;
+}
+
 export async function addMember(messId: string, input: { displayName: string }) {
   const sb = await getSupabase();
   const { error } = await sb

@@ -96,12 +96,10 @@ select is(
   tests.val('A.saad'),
   'joining twice returns the same membership'
 );
-select throws_ok(
+select lives_ok(
   $$ insert into public.mess_members (mess_id, display_name)
      values (tests.id('A.mess_id'), 'Nope') $$,
-  '42501',
-  null,
-  'members cannot add members'
+  'any member can add a placeholder'
 );
 
 select tests.login('alif');
@@ -152,12 +150,10 @@ select lives_ok(
                             tests.month('A.period_id') + 3, 3) $$,
   'member updates own meals before the cutoff (upsert)'
 );
-select throws_ok(
+select lives_ok(
   $$ select public.set_meal(tests.id('A.mess_id'), tests.id('A.member_id'),
                             tests.month('A.period_id') + 3, 1) $$,
-  '42501',
-  null,
-  'member cannot set someone else''s meals'
+  'any member can set anyone''s meals (equal access)'
 );
 select throws_ok(
   $$ select public.set_meal(tests.id('A.mess_id'), tests.id('A.saad'),
@@ -166,12 +162,10 @@ select throws_ok(
   null,
   'meals must be in 0.5 steps'
 );
-select throws_ok(
+select lives_ok(
   $$ select public.set_meal(tests.id('B.mess_id'), tests.id('B.saad'),
                             tests.month('B.period_id') + 3, 1) $$,
-  '42501',
-  null,
-  'member cannot set meals after the cutoff'
+  'the cutoff is a reminder, not a lock'
 );
 
 select tests.login('ayman');
@@ -254,13 +248,11 @@ select throws_ok(
   null,
   'items must sum to the amount'
 );
-select throws_ok(
+select lives_ok(
   $$ insert into public.expenses (mess_id, period_id, member_id, date, amount)
      values (tests.id('A.mess_id'), tests.id('A.period_id'), tests.id('A.member_id'),
              tests.month('A.period_id') + 1, 100) $$,
-  '42501',
-  null,
-  'member cannot add an expense paid by someone else'
+  'any member can record an expense paid by someone else'
 );
 select throws_like(
   $$ insert into public.expenses (mess_id, period_id, member_id, date, amount)
@@ -281,9 +273,9 @@ insert into tests.kv select 'A.ayman_exp', id::text from e;
 
 select tests.login('saad');
 select is(
-  tests.affected($$ update public.expenses set note = 'hacked' where id = tests.id('A.ayman_exp') $$),
-  0,
-  'member cannot edit someone else''s expense'
+  tests.affected($$ update public.expenses set note = 'fixed' where id = tests.id('A.ayman_exp') $$),
+  1,
+  'any member can edit anyone''s expense'
 );
 select is(
   tests.affected($$ update public.expenses set note = 'Karwan bazar'
@@ -295,12 +287,10 @@ select is(
 -- ---------------------------------------------------------------------------
 -- Bills
 -- ---------------------------------------------------------------------------
-select throws_ok(
+select lives_ok(
   $$ insert into public.bills (mess_id, period_id, kind, amount)
      values (tests.id('A.mess_id'), tests.id('A.period_id'), 'wifi', 650) $$,
-  '42501',
-  null,
-  'members cannot add bills'
+  'any member can add bills'
 );
 select tests.login('ayman');
 select lives_ok(
@@ -322,7 +312,7 @@ select is(
 );
 select is(
   jsonb_array_length(public.get_period_bundle(tests.id('A.mess_id')) -> 'meals'),
-  1,
+  2,
   'bundle omits soft-deleted entries'
 );
 select is(
@@ -332,7 +322,7 @@ select is(
 );
 select is(
   jsonb_array_length(public.get_period_bundle(tests.id('A.mess_id')) -> 'members'),
-  3,
+  4,
   'bundle includes every member'
 );
 select ok(
@@ -362,12 +352,12 @@ select throws_ok(
 -- ---------------------------------------------------------------------------
 -- Closing and reopening a month
 -- ---------------------------------------------------------------------------
-select tests.login('saad');
+select tests.login('x');
 select throws_ok(
   $$ select public.close_period(tests.id('A.period_id'), '{}', '[]') $$,
   '42501',
   null,
-  'members cannot close the month'
+  'outsiders cannot close the month'
 );
 
 select tests.login('ayman');
@@ -424,11 +414,12 @@ select is(
   0,
   'members cannot edit expenses in a closed month'
 );
+select tests.login('x');
 select throws_ok(
   $$ select public.reopen_period(tests.id('A.period_id'), 'typo') $$,
   '42501',
   null,
-  'members cannot reopen a month'
+  'outsiders cannot reopen a month'
 );
 
 select tests.login('ayman');
@@ -451,13 +442,98 @@ select is(
 select is(
   tests.affected($$ update public.meal_entries set meals = 2
                     where period_id = tests.id('A.period_id') and deleted_at is null $$),
-  1,
+  2,
   'a reopened month is editable again'
 );
 select is(
   public.get_period_bundle(tests.id('A.mess_id')) -> 'period' ->> 'id',
   tests.val('A.next'),
   'the current period stays the newer month while an old one is reopened'
+);
+
+-- ---------------------------------------------------------------------------
+-- The manager title: anyone hands it on, one holder at a time
+-- ---------------------------------------------------------------------------
+select tests.login('saad');
+select lives_ok(
+  $$ select public.set_manager(tests.id('A.saad')) $$,
+  'any member can make themselves manager'
+);
+select is(
+  (select count(*) from public.mess_members
+   where mess_id = tests.id('A.mess_id') and role = 'manager' and status = 'active'),
+  1::bigint,
+  'there is exactly one manager'
+);
+select is(
+  (select role::text from public.mess_members where id = tests.id('A.member_id')),
+  'member',
+  'the previous manager becomes a member'
+);
+select throws_ok(
+  $$ select public.set_manager((select id from public.mess_members
+                                where mess_id = tests.id('A.mess_id') and display_name = 'Nope')) $$,
+  '23514',
+  null,
+  'a placeholder cannot be manager'
+);
+select throws_ok(
+  $$ update public.mess_members set role = 'manager' where id = tests.id('A.alif') $$,
+  '42501',
+  null,
+  'the title changes only through set_manager'
+);
+select tests.login('x');
+select throws_ok(
+  $$ select public.set_manager(tests.id('A.saad')) $$,
+  '42501',
+  null,
+  'outsiders cannot change the manager'
+);
+
+-- ---------------------------------------------------------------------------
+-- Deleting a mess: only while nobody else has joined; restorable
+-- ---------------------------------------------------------------------------
+select tests.login('ayman');
+select throws_like(
+  $$ select public.delete_mess(tests.id('A.mess_id'), 'Mess A') $$,
+  '%cannot be deleted%',
+  'a mess others have joined cannot be deleted'
+);
+select tests.login('x');
+insert into tests.kv
+select 'C.' || key, value from jsonb_each_text(public.create_mess('Mess C', 'X'));
+insert into public.mess_members (mess_id, display_name) values (tests.id('C.mess_id'), 'Ghost');
+select throws_ok(
+  $$ select public.delete_mess(tests.id('C.mess_id'), 'wrong name') $$,
+  '22023',
+  null,
+  'deleting needs the exact mess name'
+);
+select lives_ok(
+  $$ select public.delete_mess(tests.id('C.mess_id'), 'Mess C') $$,
+  'a mess nobody else joined can be deleted (placeholders do not count)'
+);
+select throws_ok(
+  $$ select public.set_meal(tests.id('C.mess_id'), tests.id('C.member_id'),
+                            tests.month('C.period_id'), 1) $$,
+  '42501',
+  null,
+  'a deleted mess is read-only'
+);
+select is(
+  public.preview_invite(tests.val('C.invite_code')),
+  null,
+  'a deleted mess cannot be joined'
+);
+select lives_ok(
+  $$ select public.restore_mess(tests.id('C.mess_id')) $$,
+  'a deleted mess can be restored'
+);
+select is(
+  (select deleted_at from public.messes where id = tests.id('C.mess_id')),
+  null,
+  'restoring brings it back'
 );
 
 -- ---------------------------------------------------------------------------

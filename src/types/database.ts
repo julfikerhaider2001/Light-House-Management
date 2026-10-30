@@ -265,6 +265,7 @@ export type Database = {
           created_at: string;
           created_by: string | null;
           currency: string;
+          deleted_at: string | null;
           id: string;
           invite_code: string;
           meal_cutoff_time: string;
@@ -276,6 +277,7 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           currency?: string;
+          deleted_at?: string | null;
           id?: string;
           invite_code?: string;
           meal_cutoff_time?: string;
@@ -286,6 +288,7 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           currency?: string;
+          deleted_at?: string | null;
           id?: string;
           invite_code?: string;
           meal_cutoff_time?: string;
@@ -518,6 +521,7 @@ export type Database = {
         Returns: string;
       };
       create_mess: { Args: { p_display_name?: string; p_name?: string }; Returns: Json };
+      delete_mess: { Args: { p_confirm_name: string; p_mess: string }; Returns: undefined };
       expense_items_valid: { Args: { items: Json; total: number }; Returns: boolean };
       gen_invite_code: { Args: Record<PropertyKey, never>; Returns: string };
       get_period_bundle: { Args: { p_mess: string; p_period?: string }; Returns: Json };
@@ -538,6 +542,8 @@ export type Database = {
       preview_invite: { Args: { p_code: string }; Returns: Json };
       regenerate_invite_code: { Args: { p_mess: string }; Returns: string };
       reopen_period: { Args: { p_period: string; p_reason: string }; Returns: undefined };
+      restore_mess: { Args: { p_mess: string }; Returns: undefined };
+      set_manager: { Args: { p_member: string }; Returns: undefined };
       set_meal: {
         Args: {
           p_date: string;

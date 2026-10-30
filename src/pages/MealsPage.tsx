@@ -7,15 +7,13 @@ import { t } from '../i18n';
 import { mealsFor, periodMembers, useBundle, useSetMeal } from '../lib/api/bundle';
 import { useCurrentMess } from '../lib/api/current';
 import { mealCount } from '../lib/format';
-import { useNow } from '../lib/useNow';
-import { formatDay, formatMonth, mealDeadline, monthDays, todayIn } from '../lib/time';
+import { formatDay, formatMonth, monthDays, todayIn } from '../lib/time';
 
 export default function MealsPage() {
-  const { messId, memberId, isManager } = useCurrentMess();
+  const { messId } = useCurrentMess();
   const bundle = useBundle(messId);
   const setMeal = useSetMeal(messId);
   const toast = useToast();
-  const now = useNow(30_000);
   const [editing, setEditing] = useState<{ memberId: string; date: string } | null>(null);
 
   if (bundle.isPending) return <Spinner label={t('common.loading')} />;
@@ -26,11 +24,8 @@ export default function MealsPage() {
   const days = monthDays(b.period.month);
   const today = todayIn(b.mess.timezone);
   const open = b.period.status === 'open';
-  const canEdit = (member: string, date: string) =>
-    open &&
-    (isManager ||
-      (member === memberId &&
-        now < mealDeadline(date, b.mess.meal_cutoff_time, b.mess.timezone).getTime()));
+  // Like a shared sheet: anyone can change any cell while the month is open.
+  const canEdit = () => open;
 
   const dayTotal = (date: string) => members.reduce((s, m) => s + mealsFor(b, m.id, date), 0);
   const memberTotal = (id: string) =>
@@ -74,7 +69,7 @@ export default function MealsPage() {
                   </th>
                   {members.map((m) => {
                     const v = mealsFor(b, m.id, date);
-                    const editable = canEdit(m.id, date);
+                    const editable = canEdit();
                     return (
                       <td key={m.id}>
                         <button

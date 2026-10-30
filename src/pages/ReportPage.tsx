@@ -1,5 +1,5 @@
 import { Download, Printer } from 'lucide-react';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { Button, Card, Eyebrow, Money, PageHeader, Spinner, StatusPill } from '../components/ui';
 import { t, type MessageKey } from '../i18n';
 import { useBundle, useReport } from '../lib/api/bundle';
@@ -139,6 +139,7 @@ export default function ReportPage() {
         <h2 id="breakdown-title" className="h3 pad-x">
           {t('report.breakdown')}
         </h2>
+        <p className="muted small pad-x">{t('report.paidHint')}</p>
         <div className="grid-scroll" tabIndex={0} aria-labelledby="breakdown-title">
           <table className="grid report-table mono">
             <thead>
@@ -168,7 +169,17 @@ export default function ReportPage() {
                   <td>{mealCount(r.meals)}</td>
                   {visible.map(([key, pick, signed]) => (
                     <td key={key} data-testid={`${key.split('.')[1]}-${slug(r.name)}`}>
-                      <Money value={pick(r)} signed={signed ?? false} />
+                      {key === 'report.paid' && b.period.status === 'open' ? (
+                        <Link
+                          to={`/payments?member=${r.memberId}`}
+                          className="cell-link"
+                          aria-label={`${t('report.paid')} ${r.name}`}
+                        >
+                          <Money value={pick(r)} />
+                        </Link>
+                      ) : (
+                        <Money value={pick(r)} signed={signed ?? false} />
+                      )}
                     </td>
                   ))}
                 </tr>

@@ -11,7 +11,7 @@ const MembershipSchema = z.object({
   role: z.enum(['manager', 'member']),
   status: z.enum(['active', 'left']),
   display_name: z.string(),
-  messes: z.object({ name: z.string() }),
+  messes: z.object({ name: z.string(), deleted_at: z.nullable(z.string()) }),
 });
 export type Membership = z.infer<typeof MembershipSchema>;
 
@@ -24,7 +24,7 @@ export function useMemberships(userId: string | undefined) {
       const sb = await getSupabase();
       const { data, error } = await sb
         .from('mess_members')
-        .select('id, mess_id, role, status, display_name, messes(name)')
+        .select('id, mess_id, role, status, display_name, messes(name, deleted_at)')
         .eq('user_id', userId ?? '')
         .order('created_at');
       if (error) throw error;
