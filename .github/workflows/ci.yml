@@ -79,7 +79,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Start local Supabase
-        run: npx supabase start -x "$SUPABASE_EXCLUDE,realtime"
+        run: bash scripts/supabase-start.sh "$SUPABASE_EXCLUDE,realtime"
       - name: Apply every migration from zero
         run: npx supabase db reset
       - name: Lint schema (errors fail)
@@ -136,7 +136,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Start local Supabase
-        run: npx supabase start -x "$SUPABASE_EXCLUDE"
+        run: bash scripts/supabase-start.sh "$SUPABASE_EXCLUDE"
       - name: Point the build at local Supabase
         run: |
           npx supabase status -o env > /tmp/sb.env
