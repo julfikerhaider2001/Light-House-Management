@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { Card, PageHeader } from '../components/ui';
 import { t, type MessageKey } from '../i18n';
-import { useBundle } from '../lib/api/bundle';
 import { useCurrentMess } from '../lib/api/current';
 import { signOut } from '../lib/api/session';
 
@@ -29,21 +28,9 @@ const LINKS: { to: string; label: MessageKey; icon: LucideIcon }[] = [
 
 export default function MorePage() {
   const { memberships, messId, switchMess } = useCurrentMess();
-  const bundle = useBundle(messId);
-  const code = bundle.data?.mess.invite_code;
   return (
     <>
       <PageHeader eyebrow={t('app.name').toUpperCase()} title={t('nav.more')} />
-      {code ? (
-        <Card aria-labelledby="invite-title">
-          <h2 id="invite-title" className="h3">
-            {t('onboarding.inviteCode')}
-          </h2>
-          <p className="mono invite-code" data-testid="invite-code">
-            {code}
-          </p>
-        </Card>
-      ) : null}
       <Card>
         <ul className="list" role="list">
           {LINKS.map(({ to, label, icon: Icon }) => (
