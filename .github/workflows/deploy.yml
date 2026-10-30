@@ -1,0 +1,204 @@
+# Push to main → all gates (ci.yml) → D1 DB → D2 Web → D3 Smoke → D4 Android.
+# Migrations are forward-only and backward-compatible, so a rollback is a redeploy
+# of the previous web build (re-run this workflow on that commit).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22
+  PAGES_URL: https://julfikerhaider2001.github.io/Light-House-Management/
+
+jobs:
+  gates:
+    name: Gates
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  db:
+    name: D1 DB
+    needs: gates
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Link production project
+        run: npx supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+      - name: Migration plan (dry run)
+        run: npx supabase db push --dry-run --password "$SUPABASE_DB_PASSWORD"
+      - name: Apply migrations
+        run: npx supabase db push --password "$SUPABASE_DB_PASSWORD" --yes
+      - name: Push auth config if config.toml changed
+        run: |
+          if [ "$(git rev-list --count HEAD)" -lt 2 ] || ! git diff --quiet HEAD~1 HEAD -- supabase/config.toml; then
+            npx supabase config push --project-ref "$SUPABASE_PROJECT_ID" --yes
+          else
+            echo "supabase/config.toml unchanged; skipping config push"
+          fi
+
+  web:
+    name: D2 Web
+    needs: db
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Production build
+        run: npm run build
+        env:
+          VITE_APP_VERSION: ${{ github.sha }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      - name: SPA fallback for Pages
+        run: cp dist/index.html dist/404.html
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v5
+
+  smoke:
+    name: D3 Smoke
+    needs: web
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    env:
+      SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - name: Live /version.json equals this commit
+        run: |
+          set -o pipefail
+          expected="${GITHUB_SHA::7}"
+          for i in $(seq 1 30); do
+            live="$(curl -sf -H 'Cache-Control: no-cache' "${PAGES_URL}version.json?t=$(date +%s)" | jq -r .version || true)"
+            echo "attempt $i: live=$live expected=$expected" | tee -a smoke.log
+            [ "$live" = "$expected" ] && exit 0
+            sleep 10
+          done
+          echo "Live version never matched $expected" | tee -a smoke.log
+          exit 1
+      - name: Production health() is healthy
+        run: |
+          set -o pipefail
+          body="$(curl -sS --fail-with-body -X POST "$SUPABASE_URL/rest/v1/rpc/health" \
+            -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" -d '{}' | tee -a smoke.log)"
+          echo "$body"
+          test "$(echo "$body" | jq -r .status)" = "healthy"
+      - name: Open an issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Deploy smoke test failed for \`${GITHUB_SHA}\`."
+            echo
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            echo '```'
+            cat smoke.log 2>/dev/null || echo "(no smoke log)"
+            echo '```'
+          } > issue.md
+          gh issue create -R "$GITHUB_REPOSITORY" --title "Deploy smoke failed: ${GITHUB_SHA::7}" --body-file issue.md
+
+  android:
+    name: D4 Android
+    needs: smoke
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+      - run: npm ci
+      - name: Build web assets (offline fallback lives in the APK)
+        run: npm run build
+        env:
+          VITE_APP_VERSION: ${{ github.sha }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      - name: Capacitor sync
+        run: npx cap sync android
+      - name: Signed release APK
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_VERSION_CODE: ${{ github.run_number }}
+          ANDROID_VERSION_NAME: 1.0.${{ github.run_number }}
+        run: |
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/release.jks"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$ANDROID_KEYSTORE_PATH"
+          cd android && ./gradlew --no-daemon assembleRelease
+          rm -f "$ANDROID_KEYSTORE_PATH"
+          apk=app/build/outputs/apk/release/app-release.apk
+          "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/apksigner verify --print-certs "$apk"
+          cp "$apk" "$GITHUB_WORKSPACE/light-house-${{ github.run_number }}.apk"
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="build-${{ github.run_number }}"
+          gh release create "$tag" "light-house-${{ github.run_number }}.apk" \
+            --target "$GITHUB_SHA" --title "Light House build ${{ github.run_number }}" \
+            --notes "Signed release APK for commit ${GITHUB_SHA}. The app loads ${PAGES_URL}, so it always shows the latest web deploy."
+      - name: Keep the latest 5 releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list -R "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt \
+            --jq '[.[] | select(.tagName | startswith("build-"))] | sort_by(.createdAt) | reverse | .[5:] | .[].tagName' \
+          | while read -r tag; do
+              echo "Deleting old release $tag"
+              gh release delete "$tag" -R "$GITHUB_REPOSITORY" --yes --cleanup-tag
+            done

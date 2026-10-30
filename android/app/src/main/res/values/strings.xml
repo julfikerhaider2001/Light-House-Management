@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Light House</string>
+    <string name="title_activity_main">Light House</string>
+    <string name="package_name">com.lighthouse.mess</string>
+    <string name="custom_url_scheme">com.lighthouse.mess</string>
+</resources>

@@ -1,0 +1,27 @@
+# Free-tier Supabase pauses after a week without activity; one health() call a day prevents it.
+name: Keepalive
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: Ping health()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call production health()
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          set -o pipefail
+          body="$(curl -sS --fail-with-body --retry 3 --retry-delay 10 -X POST "$SUPABASE_URL/rest/v1/rpc/health" \
+            -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" -d '{}')"
+          echo "$body"
+          test "$(echo "$body" | jq -r .status)" = "healthy"

@@ -1,0 +1,50 @@
+# Weekly data-only dump, encrypted before it leaves the runner. Plaintext is never uploaded.
+name: Backup
+
+on:
+  schedule:
+    - cron: '30 20 * * 5' # Saturday 02:30 Asia/Dhaka
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    name: Encrypted data dump
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Link production project
+        run: npx supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+      - name: Dump data
+        run: |
+          mkdir -p "$RUNNER_TEMP/plain" backup
+          npx supabase db dump --linked --data-only --password "$SUPABASE_DB_PASSWORD" -f "$RUNNER_TEMP/plain/data.sql"
+          test -s "$RUNNER_TEMP/plain/data.sql"
+      - name: Encrypt (AES256, BACKUP_PASSPHRASE)
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          printf %s "$BACKUP_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
+            --symmetric --cipher-algo AES256 -o "backup/light-house-data-$stamp.sql.gpg" "$RUNNER_TEMP/plain/data.sql"
+          shred -u "$RUNNER_TEMP/plain/data.sql"
+          ls -la backup
+      - uses: actions/upload-artifact@v7
+        with:
+          name: supabase-data-backup
+          path: backup/*.sql.gpg
+          retention-days: 30
+          if-no-files-found: error
