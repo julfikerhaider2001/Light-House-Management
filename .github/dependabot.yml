@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint supports TypeScript <6.1; lift once it supports newer majors.
+      - dependency-name: typescript
+        versions: ['>=6.1']
+      # Runtime is Node 22 (CI + engines); types must match it.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     groups:
       minor-and-patch:
         update-types: [minor, patch]
