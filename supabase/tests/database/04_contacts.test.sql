@@ -39,7 +39,7 @@ set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"44444444-4444-4444-8444-444444444444","role":"authenticated"}', true);
 select throws_ok(
-  $ select * from public.member_contacts((select id from target)) $,
+  $$ select * from public.member_contacts((select id from target)) $$,
   '42501',
   null,
   'outsiders cannot read email addresses'
