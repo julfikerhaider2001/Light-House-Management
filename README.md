@@ -3,7 +3,7 @@
 Meals, bazar, bills and month-end settlement for a shared mess. It replaces the mess Google Sheet and reproduces its numbers to the taka. One codebase ships as:
 
 - **Web app / PWA:** https://julfikerhaider2001.github.io/Light-House-Management/
-- **Android APK:** [latest release](https://github.com/julfikerhaider2001/Light-House-Management/releases/latest) (signed; it loads the live web app, so every deploy updates phones instantly)
+- **Android APK:** [download the latest app](https://github.com/julfikerhaider2001/Light-House-Management/releases/latest/download/light-house.apk) ([all releases](https://github.com/julfikerhaider2001/Light-House-Management/releases)) (signed; it loads the live web app, so every deploy updates phones instantly)
 - **Status page:** https://julfikerhaider2001.github.io/Light-House-Management/#/status
 
 iPhone users install the PWA from Safari (Share → Add to Home Screen).

@@ -184,12 +184,15 @@ jobs:
           apk=app/build/outputs/apk/release/app-release.apk
           "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/apksigner verify --print-certs "$apk"
           cp "$apk" "$GITHUB_WORKSPACE/light-house-${{ github.run_number }}.apk"
+          # Same file under a fixed name: releases/latest/download/light-house.apk always
+          # downloads the newest build directly.
+          cp "$apk" "$GITHUB_WORKSPACE/light-house.apk"
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="build-${{ github.run_number }}"
-          gh release create "$tag" "light-house-${{ github.run_number }}.apk" \
+          gh release create "$tag" "light-house-${{ github.run_number }}.apk" light-house.apk \
             --target "$GITHUB_SHA" --title "Light House build ${{ github.run_number }}" \
             --notes "Signed release APK for commit ${GITHUB_SHA}. The app loads ${PAGES_URL}, so it always shows the latest web deploy."
       - name: Keep the latest 5 releases
