@@ -91,7 +91,7 @@ export const EXPECTED = {
       haveToPay: '-373',
       initialDue: '-53.75',
       total: '5351',
-      final: '5426',
+      final: '5427', // DELIBERATELY WRONG: proves a failing gate blocks merge
       settledBase: '5425.25',
     },
     Saad: {
