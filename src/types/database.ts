@@ -3,16 +3,566 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never;
+      activity_log: {
+        Row: {
+          action: string;
+          actor: string | null;
+          created_at: string;
+          entity: string;
+          entity_id: string | null;
+          id: number;
+          mess_id: string;
+          payload: NonNullable<Json>;
+        };
+        ComputedFields: never;
+        Insert: {
+          action: string;
+          actor?: string | null;
+          created_at?: string;
+          entity: string;
+          entity_id?: string | null;
+          id?: never;
+          mess_id: string;
+          payload?: NonNullable<Json>;
+        };
+        Update: {
+          action?: string;
+          actor?: string | null;
+          created_at?: string;
+          entity?: string;
+          entity_id?: string | null;
+          id?: never;
+          mess_id?: string;
+          payload?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'activity_log_mess_id_fkey';
+            columns: ['mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'messes';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      bills: {
+        Row: {
+          amount: number;
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          kind: Database['public']['Enums']['bill_kind'];
+          label: string | null;
+          mess_id: string;
+          period_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          kind: Database['public']['Enums']['bill_kind'];
+          label?: string | null;
+          mess_id: string;
+          period_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          kind?: Database['public']['Enums']['bill_kind'];
+          label?: string | null;
+          mess_id?: string;
+          period_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'bills_period_id_mess_id_fkey';
+            columns: ['period_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'periods';
+            referencedColumns: ['id', 'mess_id'];
+          },
+        ];
+      };
+      expenses: {
+        Row: {
+          amount: number;
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          deleted_at: string | null;
+          id: string;
+          items: NonNullable<Json>;
+          kind: Database['public']['Enums']['expense_kind'];
+          member_id: string;
+          mess_id: string;
+          note: string | null;
+          period_id: string;
+          receipt_path: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          created_at?: string;
+          created_by?: string | null;
+          date: string;
+          deleted_at?: string | null;
+          id?: string;
+          items?: NonNullable<Json>;
+          kind?: Database['public']['Enums']['expense_kind'];
+          member_id: string;
+          mess_id: string;
+          note?: string | null;
+          period_id: string;
+          receipt_path?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          deleted_at?: string | null;
+          id?: string;
+          items?: NonNullable<Json>;
+          kind?: Database['public']['Enums']['expense_kind'];
+          member_id?: string;
+          mess_id?: string;
+          note?: string | null;
+          period_id?: string;
+          receipt_path?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'expenses_member_id_mess_id_fkey';
+            columns: ['member_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'mess_members';
+            referencedColumns: ['id', 'mess_id'];
+          },
+          {
+            foreignKeyName: 'expenses_period_id_mess_id_fkey';
+            columns: ['period_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'periods';
+            referencedColumns: ['id', 'mess_id'];
+          },
+        ];
+      };
+      meal_entries: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          deleted_at: string | null;
+          id: string;
+          meals: number;
+          member_id: string;
+          mess_id: string;
+          note: string | null;
+          period_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          date: string;
+          deleted_at?: string | null;
+          id?: string;
+          meals: number;
+          member_id: string;
+          mess_id: string;
+          note?: string | null;
+          period_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          deleted_at?: string | null;
+          id?: string;
+          meals?: number;
+          member_id?: string;
+          mess_id?: string;
+          note?: string | null;
+          period_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'meal_entries_member_id_mess_id_fkey';
+            columns: ['member_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'mess_members';
+            referencedColumns: ['id', 'mess_id'];
+          },
+          {
+            foreignKeyName: 'meal_entries_period_id_mess_id_fkey';
+            columns: ['period_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'periods';
+            referencedColumns: ['id', 'mess_id'];
+          },
+        ];
+      };
+      mess_members: {
+        Row: {
+          created_at: string;
+          display_name: string;
+          id: string;
+          joined_on: string;
+          left_on: string | null;
+          mess_id: string;
+          role: Database['public']['Enums']['member_role'];
+          status: Database['public']['Enums']['member_status'];
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          display_name: string;
+          id?: string;
+          joined_on?: string;
+          left_on?: string | null;
+          mess_id: string;
+          role?: Database['public']['Enums']['member_role'];
+          status?: Database['public']['Enums']['member_status'];
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          display_name?: string;
+          id?: string;
+          joined_on?: string;
+          left_on?: string | null;
+          mess_id?: string;
+          role?: Database['public']['Enums']['member_role'];
+          status?: Database['public']['Enums']['member_status'];
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'mess_members_mess_id_fkey';
+            columns: ['mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'messes';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      messes: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          currency: string;
+          id: string;
+          invite_code: string;
+          meal_cutoff_time: string;
+          name: string;
+          timezone: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          id?: string;
+          invite_code?: string;
+          meal_cutoff_time?: string;
+          name?: string;
+          timezone?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          id?: string;
+          invite_code?: string;
+          meal_cutoff_time?: string;
+          name?: string;
+          timezone?: string;
+        };
+        Relationships: [];
+      };
+      payments: {
+        Row: {
+          amount: number;
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          deleted_at: string | null;
+          id: string;
+          member_id: string;
+          mess_id: string;
+          method: Database['public']['Enums']['payment_method'];
+          note: string | null;
+          period_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          created_at?: string;
+          created_by?: string | null;
+          date: string;
+          deleted_at?: string | null;
+          id?: string;
+          member_id: string;
+          mess_id: string;
+          method?: Database['public']['Enums']['payment_method'];
+          note?: string | null;
+          period_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          deleted_at?: string | null;
+          id?: string;
+          member_id?: string;
+          mess_id?: string;
+          method?: Database['public']['Enums']['payment_method'];
+          note?: string | null;
+          period_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payments_member_id_mess_id_fkey';
+            columns: ['member_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'mess_members';
+            referencedColumns: ['id', 'mess_id'];
+          },
+          {
+            foreignKeyName: 'payments_period_id_mess_id_fkey';
+            columns: ['period_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'periods';
+            referencedColumns: ['id', 'mess_id'];
+          },
+        ];
+      };
+      periods: {
+        Row: {
+          closed_at: string | null;
+          closed_by: string | null;
+          created_at: string;
+          id: string;
+          mess_id: string;
+          month: string;
+          reopen_reason: string | null;
+          reopened_at: string | null;
+          snapshot: Json | null;
+          status: Database['public']['Enums']['period_status'];
+        };
+        ComputedFields: never;
+        Insert: {
+          closed_at?: string | null;
+          closed_by?: string | null;
+          created_at?: string;
+          id?: string;
+          mess_id: string;
+          month: string;
+          reopen_reason?: string | null;
+          reopened_at?: string | null;
+          snapshot?: Json | null;
+          status?: Database['public']['Enums']['period_status'];
+        };
+        Update: {
+          closed_at?: string | null;
+          closed_by?: string | null;
+          created_at?: string;
+          id?: string;
+          mess_id?: string;
+          month?: string;
+          reopen_reason?: string | null;
+          reopened_at?: string | null;
+          snapshot?: Json | null;
+          status?: Database['public']['Enums']['period_status'];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'periods_mess_id_fkey';
+            columns: ['mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'messes';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      previous_dues: {
+        Row: {
+          amount: number;
+          member_id: string;
+          mess_id: string;
+          period_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount?: number;
+          member_id: string;
+          mess_id: string;
+          period_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          member_id?: string;
+          mess_id?: string;
+          period_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'previous_dues_member_id_mess_id_fkey';
+            columns: ['member_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'mess_members';
+            referencedColumns: ['id', 'mess_id'];
+          },
+          {
+            foreignKeyName: 'previous_dues_period_id_mess_id_fkey';
+            columns: ['period_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'periods';
+            referencedColumns: ['id', 'mess_id'];
+          },
+        ];
+      };
+      profiles: {
+        Row: {
+          created_at: string;
+          display_name: string;
+          id: string;
+          phone: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          display_name: string;
+          id: string;
+          phone?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          display_name?: string;
+          id?: string;
+          phone?: string | null;
+        };
+        Relationships: [];
+      };
+      rent_shares: {
+        Row: {
+          fixed_amount: number | null;
+          member_id: string;
+          mess_id: string;
+          period_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          fixed_amount?: number | null;
+          member_id: string;
+          mess_id: string;
+          period_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          fixed_amount?: number | null;
+          member_id?: string;
+          mess_id?: string;
+          period_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rent_shares_member_id_mess_id_fkey';
+            columns: ['member_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'mess_members';
+            referencedColumns: ['id', 'mess_id'];
+          },
+          {
+            foreignKeyName: 'rent_shares_period_id_mess_id_fkey';
+            columns: ['period_id', 'mess_id'];
+            isOneToOne: false;
+            referencedRelation: 'periods';
+            referencedColumns: ['id', 'mess_id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      close_period: {
+        Args: { p_carry?: Json; p_period: string; p_snapshot: Json };
+        Returns: string;
+      };
+      create_mess: { Args: { p_display_name?: string; p_name?: string }; Returns: Json };
+      expense_items_valid: { Args: { items: Json; total: number }; Returns: boolean };
+      gen_invite_code: { Args: Record<PropertyKey, never>; Returns: string };
+      get_period_bundle: { Args: { p_mess: string; p_period?: string }; Returns: Json };
       health: { Args: Record<PropertyKey, never>; Returns: Json };
+      join_mess: {
+        Args: { p_claim_member?: string; p_code: string; p_display_name?: string };
+        Returns: Json;
+      };
+      meal_edit_deadline: { Args: { p_date: string; p_mess: string }; Returns: string };
+      preview_invite: { Args: { p_code: string }; Returns: Json };
+      regenerate_invite_code: { Args: { p_mess: string }; Returns: string };
+      reopen_period: { Args: { p_period: string; p_reason: string }; Returns: undefined };
+      set_meal: {
+        Args: {
+          p_date: string;
+          p_meals: number;
+          p_member: string;
+          p_mess: string;
+          p_note?: string;
+        };
+        Returns: {
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          deleted_at: string | null;
+          id: string;
+          meals: number;
+          member_id: string;
+          mess_id: string;
+          note: string | null;
+          period_id: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'meal_entries';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
     };
     Enums: {
-      [_ in never]: never;
+      bill_kind: 'khala' | 'house_rent' | 'wifi' | 'gas' | 'electricity' | 'extra' | 'other';
+      expense_kind: 'bazar' | 'initial';
+      member_role: 'manager' | 'member';
+      member_status: 'active' | 'left';
+      payment_method: 'cash' | 'bkash' | 'nagad' | 'bank';
+      period_status: 'open' | 'closed';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -123,6 +673,13 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      bill_kind: ['khala', 'house_rent', 'wifi', 'gas', 'electricity', 'extra', 'other'],
+      expense_kind: ['bazar', 'initial'],
+      member_role: ['manager', 'member'],
+      member_status: ['active', 'left'],
+      payment_method: ['cash', 'bkash', 'nagad', 'bank'],
+      period_status: ['open', 'closed'],
+    },
   },
 } as const;
