@@ -15,6 +15,12 @@ const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
 const TodayPage = lazy(() => import('./pages/TodayPage'));
 const MealsPage = lazy(() => import('./pages/MealsPage'));
 const MorePage = lazy(() => import('./pages/MorePage'));
+const BazarPage = lazy(() => import('./pages/BazarPage'));
+const BillsPage = lazy(() => import('./pages/BillsPage'));
+const PaymentsPage = lazy(() => import('./pages/PaymentsPage'));
+const ReportPage = lazy(() => import('./pages/ReportPage'));
+const ClosePage = lazy(() => import('./pages/ClosePage'));
+const ActivityPage = lazy(() => import('./pages/ActivityPage'));
 const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
 
 const loading = <Spinner label={t('common.loading')} />;
@@ -95,6 +101,12 @@ function InMess() {
             <Routes>
               <Route index element={<TodayPage />} />
               <Route path="meals" element={<MealsPage />} />
+              <Route path="bazar" element={<BazarPage />} />
+              <Route path="bills" element={<BillsPage />} />
+              <Route path="payments" element={<PaymentsPage />} />
+              <Route path="report" element={<ReportPage />} />
+              <Route path="close" element={<ClosePage />} />
+              <Route path="activity" element={<ActivityPage />} />
               <Route path="more" element={<MorePage />} />
               <Route path="onboarding" element={<OnboardingPage />} />
               <Route path="*" element={<PlaceholderPage />} />

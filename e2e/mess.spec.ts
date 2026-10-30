@@ -37,6 +37,25 @@ test('two people share a mess and see meal changes live', async ({ browser }, in
   // The member's screen updates through realtime, with no reload, within 3 s.
   await expect(saadDay1(member)).toHaveAccessibleName(/: 1$/, { timeout: 3_000 });
 
+  // The member records an itemised bazar; the manager's Bazar screen shows it live.
+  await manager.goto('./#/bazar');
+  await member.goto('./#/bazar');
+  await member.getByRole('button', { name: 'Add bazar' }).click();
+  const sheet = member.getByRole('dialog');
+  await sheet.getByRole('button', { name: '+ Add item' }).click();
+  await sheet.getByLabel('Item 1').fill('murgi');
+  await sheet.getByLabel('Amount 1').fill('230');
+  await sheet.getByRole('button', { name: '+ Add item' }).click();
+  await sheet.getByLabel('Item 2').fill('chal+milk');
+  await sheet.getByLabel('Amount 2').fill('90');
+  await expect(sheet.getByLabel('Total')).toHaveValue('320');
+  await sheet.getByRole('button', { name: 'Save expense' }).click();
+  await expect(member.getByRole('dialog')).toHaveCount(0);
+
+  await expect(manager.getByTestId('expense-list')).toContainText('murgi-230, chal+milk-90', {
+    timeout: 3_000,
+  });
+
   await managerCtx.close();
   await memberCtx.close();
 });
