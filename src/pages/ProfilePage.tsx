@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { ChevronRight, LogOut, Settings } from 'lucide-react';
+import { ChangePasswordCard } from '../components/ChangePasswordCard';
 import { ProfileCard } from '../components/ProfileCard';
 import { useToast } from '../components/toast-context';
 import { Button, Card, Field, PageHeader, Spinner } from '../components/ui';
@@ -104,6 +105,7 @@ export default function ProfilePage() {
           </Button>
         </form>
       </Card>
+      <ChangePasswordCard />
       <Card>
         <ul className="list" role="list">
           <li>

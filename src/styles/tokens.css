@@ -139,13 +139,13 @@ button {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 .stack-tight {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 5px;
 }
 
 /* ---------- Glass ---------- */
@@ -160,10 +160,10 @@ button {
 
 .card {
   border-radius: var(--radius);
-  padding: 16px 18px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 /* ---------- Shell ---------- */
@@ -175,18 +175,18 @@ button {
 .content {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 22px;
   width: min(760px, 100%);
   margin: 0 auto;
-  padding: max(20px, env(safe-area-inset-top)) 16px
-    calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom));
+  padding: max(24px, env(safe-area-inset-top)) 20px
+    calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom));
 }
 
 .center-shell {
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
 }
 
 .tabbar {
@@ -290,13 +290,13 @@ button {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 4px 4px 2px;
+  padding: 8px 4px 4px;
 }
 
 .page-header__text {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .eyebrow {
@@ -425,7 +425,7 @@ button {
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 .form--inline {
@@ -440,7 +440,7 @@ button {
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .field label {
@@ -482,7 +482,7 @@ button {
 .chip-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 /* ---------- Today ---------- */
@@ -505,7 +505,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
 }
 
 .stepper {
@@ -564,7 +564,7 @@ button {
 .quick {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
 }
 
 .quick__chip {
@@ -586,8 +586,8 @@ button {
 .notice {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 10px;
+  padding: 12px 14px;
   border-radius: 12px;
   font-size: 0.8125rem;
 }
@@ -617,12 +617,12 @@ button {
 .stat-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 12px;
 }
 
 .stat {
-  padding: 10px 12px;
-  gap: 4px;
+  padding: 14px;
+  gap: 6px;
   border-radius: 14px;
   text-decoration: none;
   color: inherit;
@@ -650,9 +650,9 @@ button {
 .list-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 6px 0;
+  gap: 14px;
+  min-height: 60px;
+  padding: 10px 0;
   border-top: 1px solid var(--glass-border);
   width: 100%;
 }
@@ -678,7 +678,7 @@ button {
   flex: 1;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -695,18 +695,18 @@ button {
 }
 
 .empty {
-  padding: 12px 0;
+  padding: 16px 0;
 }
 
 /* ---------- Meals grid ---------- */
 
 .grid-card {
-  padding: 14px 0 0;
+  padding: 18px 0 0;
   overflow: hidden;
 }
 
 .grid-card > p {
-  padding: 0 18px;
+  padding: 0 20px;
 }
 
 .grid-scroll {
@@ -812,7 +812,7 @@ button {
   max-height: 88dvh;
   overflow: auto;
   border-radius: 20px 20px 0 0;
-  padding: 0 18px calc(20px + env(safe-area-inset-bottom));
+  padding: 0 20px calc(24px + env(safe-area-inset-bottom));
   background: rgba(14, 20, 17, 0.88);
   will-change: transform;
   touch-action: pan-y;
@@ -837,13 +837,13 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
 }
 
 .sheet__body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 .sheet-stepper {
@@ -1012,7 +1012,7 @@ button {
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 
 .form-grid {
@@ -1057,7 +1057,7 @@ button {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .items legend {
@@ -1069,7 +1069,7 @@ button {
 .item-row {
   display: grid;
   grid-template-columns: 1fr 96px 44px;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -1094,9 +1094,9 @@ button {
 .expense {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 60px;
-  padding: 8px 2px;
+  gap: 14px;
+  min-height: 68px;
+  padding: 12px 2px;
 }
 
 .expense__main {
@@ -1118,7 +1118,7 @@ button {
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -1131,7 +1131,7 @@ button {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 14px 12px;
+  gap: 18px 14px;
   margin: 0;
 }
 
@@ -1147,7 +1147,7 @@ button {
 }
 
 .pad-x {
-  padding: 0 18px;
+  padding: 0 20px;
 }
 
 .report-table td {
@@ -1163,7 +1163,7 @@ button {
 .kv-list {
   margin: 0;
   display: grid;
-  gap: 8px;
+  gap: 12px;
   font-size: 0.875rem;
 }
 
@@ -1171,7 +1171,7 @@ button {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  padding-top: 8px;
+  padding-top: 12px;
   border-top: 1px solid var(--glass-border);
 }
 
@@ -1191,7 +1191,7 @@ button {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   position: relative;
 }
 
@@ -1211,8 +1211,8 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 14px;
+  padding: 18px;
   border-radius: var(--radius);
 }
 
@@ -1246,7 +1246,7 @@ button {
 /* ---------- Activity log ---------- */
 
 .log-card {
-  padding: 12px 14px;
+  padding: 16px 18px;
 }
 
 .log {
@@ -1263,7 +1263,7 @@ button {
   grid-template-columns: auto auto 1fr;
   gap: 10px;
   align-items: baseline;
-  padding: 5px 0;
+  padding: 9px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -1364,7 +1364,7 @@ button {
 .status-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
 .status-card {
@@ -1431,7 +1431,7 @@ button {
 
 .fab {
   position: fixed;
-  right: 16px;
+  right: 20px;
   bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
   z-index: 20;
   display: inline-flex;
@@ -1466,13 +1466,13 @@ button {
 
 /* Leave room so the last list row isn't hidden behind the FAB. */
 .has-fab {
-  padding-bottom: 72px;
+  padding-bottom: 84px;
 }
 
 /* ---------- Members ---------- */
 
 .member-row {
-  min-height: 60px;
+  min-height: 68px;
 }
 
 .member-row__text {
@@ -1480,7 +1480,7 @@ button {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .member-row__name {
@@ -1517,7 +1517,7 @@ button {
 .action-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding-bottom: 8px;
 }
 
