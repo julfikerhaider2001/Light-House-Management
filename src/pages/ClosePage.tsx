@@ -8,6 +8,7 @@ import { useBundle, useReport } from '../lib/api/bundle';
 import { useCurrentMess } from '../lib/api/current';
 import { closePeriod, reopenPeriod, useMessMutation } from '../lib/api/writes';
 import { mealCount, taka } from '../lib/format';
+import { haptic } from '../lib/native';
 import { addDays, formatMonth, monthDays } from '../lib/time';
 
 interface Step {
@@ -94,7 +95,10 @@ export default function ClosePage() {
         })),
       },
       {
-        onSuccess: () => toast.show(t('close.done', { month })),
+        onSuccess: () => {
+          haptic('success');
+          toast.show(t('close.done', { month }));
+        },
         onError: (err) => toast.show(err.message, { tone: 'error' }),
       },
     );
