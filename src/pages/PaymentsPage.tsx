@@ -20,6 +20,7 @@ import { useCurrentMess } from '../lib/api/current';
 import type { Bundle, Payment } from '../lib/api/schemas';
 import { addPayment, setDeleted, useMessMutation, type PaymentMethod } from '../lib/api/writes';
 import { taka } from '../lib/format';
+import { haptic } from '../lib/native';
 import { formatDay, formatMonth, todayIn } from '../lib/time';
 
 const METHODS: PaymentMethod[] = ['cash', 'bkash', 'nagad', 'bank'];
@@ -202,7 +203,13 @@ function PaymentForm({
         date,
         ...(note.trim() ? { note: note.trim() } : {}),
       },
-      { onSuccess: onDone, onError: (err) => toast.show(err.message, { tone: 'error' }) },
+      {
+        onSuccess: () => {
+          haptic('success');
+          onDone();
+        },
+        onError: (err) => toast.show(err.message, { tone: 'error' }),
+      },
     );
   };
 

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { computeReport, type CalcInput, type Report } from '../calc';
+import { haptic } from '../native';
 import { getSupabase } from '../supabase';
 import { BundleSchema, type Bundle, type Meal } from './schemas';
 
@@ -91,6 +92,7 @@ export function useSetMeal(messId: string) {
       }
       return { previous };
     },
+    onSuccess: () => haptic('tap'),
     onError: (_error, _input, context) => {
       if (context?.previous !== undefined) qc.setQueryData(key, context.previous);
     },

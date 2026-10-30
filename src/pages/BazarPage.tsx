@@ -12,6 +12,7 @@ import { addExpense, setDeleted, useMessMutation } from '../lib/api/writes';
 import { Fraction } from '../lib/calc/fraction';
 import { taka } from '../lib/format';
 import { compressImage } from '../lib/image';
+import { haptic } from '../lib/native';
 import { getSupabase } from '../lib/supabase';
 import { formatDay, formatMonth, todayIn } from '../lib/time';
 
@@ -39,10 +40,12 @@ export default function BazarPage() {
     remove.mutate(
       { table: 'expenses', id: e.id, deleted: true },
       {
-        onSuccess: () =>
+        onSuccess: () => {
+          haptic('warning');
           toast.show(t('bazar.deleted'), {
             onUndo: () => remove.mutate({ table: 'expenses', id: e.id, deleted: false }),
-          }),
+          });
+        },
         onError: (err) => toast.show(err.message, { tone: 'error' }),
       },
     );
@@ -197,6 +200,7 @@ function ExpenseForm({
         ...(note.trim() ? { note: note.trim() } : {}),
         ...(receiptPath ? { receiptPath } : {}),
       });
+      haptic('success');
       onDone();
     } catch (err) {
       toast.show(err instanceof Error ? err.message : t('errors.generic'), { tone: 'error' });
