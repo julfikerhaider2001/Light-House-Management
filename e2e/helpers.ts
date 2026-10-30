@@ -13,7 +13,7 @@ export async function signUp(page: Page, name: string, email: string, path = './
   await page.getByRole('button', { name: /New here\?/ }).click();
   await page.getByLabel('Your name').fill(name);
   await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
 }
 
