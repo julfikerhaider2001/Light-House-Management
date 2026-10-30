@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import {
   Activity,
   ChevronRight,
+  PlusCircle,
   ClipboardCheck,
   FileSpreadsheet,
   Gauge,
@@ -22,6 +23,7 @@ const LINKS: { to: string; label: MessageKey; icon: LucideIcon }[] = [
   { to: '/close', label: 'nav.close', icon: ClipboardCheck },
   { to: '/activity', label: 'nav.activity', icon: Activity },
   { to: '/members', label: 'nav.members', icon: Users },
+  { to: '/onboarding', label: 'nav.anotherMess', icon: PlusCircle },
   { to: '/import', label: 'nav.import', icon: FileSpreadsheet },
   { to: '/status', label: 'nav.status', icon: Gauge },
 ];

@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState, type FormEvent } from 'react';
+import { useContext, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Button, Card, Field } from '../components/ui';
 import { t } from '../i18n';
+import { CurrentMessContext } from '../lib/api/current';
 import { previewInvite, useCreateMess, useJoinMess, type InvitePreview } from '../lib/api/mess';
 
 export default function OnboardingPage() {
@@ -28,24 +29,32 @@ export default function OnboardingPage() {
       ? t('onboarding.codeNotFound')
       : null;
 
-  const done = () => void navigate('/', { replace: true });
+  // Inside the app (already in a mess) this joins/creates another one and switches to it.
+  const current = useContext(CurrentMessContext);
+  const done = (messId: string) => {
+    current?.switchMess(messId);
+    void navigate('/', { replace: true });
+  };
 
   const onCreate = (e: FormEvent) => {
     e.preventDefault();
-    create.mutate({ name: messName.trim() || 'Light House' }, { onSuccess: done });
+    create.mutate(
+      { name: messName.trim() || 'Light House' },
+      { onSuccess: (c) => done(c.mess_id) },
+    );
   };
 
   const onJoin = (claimMemberId?: string) => {
     join.mutate(
       { code: code.trim(), ...(claimMemberId ? { claimMemberId } : {}) },
-      { onSuccess: done },
+      { onSuccess: (j) => done(j.mess_id) },
     );
   };
 
   return (
     <main className="center-shell">
       <div className="stack onboarding">
-        <h1>{t('onboarding.title')}</h1>
+        <h1>{current ? t('onboarding.titleAnother') : t('onboarding.title')}</h1>
 
         <Card aria-labelledby="join-title">
           <h2 id="join-title">{t('onboarding.joinTitle')}</h2>
