@@ -2,9 +2,13 @@
 
 export const MAX_RECEIPT_BYTES = 300 * 1024;
 
-export async function compressImage(file: Blob, maxBytes = MAX_RECEIPT_BYTES): Promise<Blob> {
+export async function compressImage(
+  file: Blob,
+  maxBytes = MAX_RECEIPT_BYTES,
+  maxSide = 1600,
+): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
-  let scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+  let scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
   try {
     for (let attempt = 0; attempt < 8; attempt++) {
       const canvas = document.createElement('canvas');
@@ -22,5 +26,5 @@ export async function compressImage(file: Blob, maxBytes = MAX_RECEIPT_BYTES): P
   } finally {
     bitmap.close();
   }
-  throw new Error('Could not compress the photo under 300 KB');
+  throw new Error(`Could not compress the photo under ${Math.round(maxBytes / 1024)} KB`);
 }

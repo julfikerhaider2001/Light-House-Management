@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation } from 'react-router';
 import { Eye, EyeOff } from 'lucide-react';
+import { PhotoPicker } from '../components/Avatar';
 import { Button, Card, Field } from '../components/ui';
 import { t } from '../i18n';
+import { uploadAvatar } from '../lib/api/profile';
 import { signIn, signUp, useSession } from '../lib/api/session';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,31 +16,40 @@ export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [photo, setPhoto] = useState<File | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [reveal, setReveal] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const from = (location.state as { from?: string } | null)?.from ?? '/';
-  if (session.status === 'ready' && session.session) return <Navigate to={from} replace />;
+  // Stay here while a new account's photo is still uploading.
+  if (session.status === 'ready' && session.session && !busy) {
+    return <Navigate to={from} replace />;
+  }
 
   const errors = {
     email: EMAIL.test(email.trim()) ? undefined : t('auth.emailInvalid'),
     password: password.length >= 8 ? undefined : t('auth.passwordShort'),
     name: mode === 'signIn' || name.trim() ? undefined : t('auth.nameRequired'),
+    photo: mode === 'signIn' || photo ? undefined : t('auth.photoRequired'),
   };
-  const valid = !errors.email && !errors.password && !errors.name;
+  const valid = !errors.email && !errors.password && !errors.name && !errors.photo;
   const show = (k: keyof typeof errors) => (touched[k] ? errors[k] : undefined);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    setTouched({ email: true, password: true, name: true });
+    setTouched({ email: true, password: true, name: true, photo: true });
     if (!valid) return;
     setBusy(true);
     setServerError(null);
     try {
-      if (mode === 'signUp') await signUp(email.trim(), password, name.trim());
-      else await signIn(email.trim(), password);
+      if (mode === 'signUp') {
+        const userId = await signUp(email.trim(), password, name.trim());
+        if (userId && photo) await uploadAvatar(userId, photo);
+      } else {
+        await signIn(email.trim(), password);
+      }
     } catch (err) {
       setServerError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
@@ -52,6 +63,19 @@ export default function AuthPage() {
         <span className="eyebrow mono">{t('app.tagline')}</span>
         <h1>{mode === 'signIn' ? t('auth.signInTitle') : t('auth.signUpTitle')}</h1>
         <form onSubmit={(e) => void submit(e)} noValidate className="form">
+          {mode === 'signUp' ? (
+            <PhotoPicker
+              id="photo"
+              label={t('auth.photo')}
+              name={name}
+              file={photo}
+              onChange={(f) => {
+                setPhoto(f);
+                setTouched((s) => ({ ...s, photo: true }));
+              }}
+              error={show('photo')}
+            />
+          ) : null}
           {mode === 'signUp' ? (
             <Field id="name" label={t('auth.displayName')} error={show('name')}>
               <input

@@ -9,6 +9,7 @@ import {
   UserMinus,
   UserPlus,
 } from 'lucide-react';
+import { Avatar } from '../components/Avatar';
 import { Sheet } from '../components/Sheet';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../components/toast-context';
@@ -17,8 +18,8 @@ import { t, type MessageKey } from '../i18n';
 import { useBundle } from '../lib/api/bundle';
 import { useCurrentMess } from '../lib/api/current';
 import type { Member } from '../lib/api/schemas';
+import { useAvatarUrls } from '../lib/api/profile';
 import { addMember, useMessMutation } from '../lib/api/writes';
-import { initials } from '../lib/format';
 import { getSupabase } from '../lib/supabase';
 import { todayIn } from '../lib/time';
 
@@ -54,6 +55,7 @@ export default function MembersPage() {
   const [name, setName] = useState('');
   const [touched, setTouched] = useState(false);
   const [managing, setManaging] = useState<Member | null>(null);
+  const photos = useAvatarUrls(bundle.data);
 
   if (bundle.isPending) return <Spinner label={t('common.loading')} />;
   const b = bundle.data;
@@ -170,9 +172,12 @@ export default function MembersPage() {
             <ul className="list" role="list">
               {list.map((m) => (
                 <li key={m.id} className={`list-row member-row member-row--${key}`}>
-                  <span className="avatar mono" aria-hidden="true">
-                    {initials(m.display_name)}
-                  </span>
+                  <Avatar
+                    name={m.display_name}
+                    url={m.user_id ? photos.get(m.user_id) : undefined}
+                    size={40}
+                    dashed={key === 'invited'}
+                  />
                   <span className="member-row__text">
                     <span className="member-row__name">{m.display_name}</span>
                     <span className="member-row__chips">

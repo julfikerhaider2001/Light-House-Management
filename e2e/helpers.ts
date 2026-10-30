@@ -1,7 +1,11 @@
 import { expect, type Page, type TestInfo } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 import type { Database } from '../src/types/database';
 
 export const PASSWORD = 'correct-horse-42';
+
+// Sign-up requires a profile photo.
+export const PHOTO = fileURLToPath(new URL('./fixtures/me.png', import.meta.url));
 
 export function uniqueEmail(info: TestInfo, who: string): string {
   return `e2e-${Date.now()}-${info.project.name}-${who}@example.com`;
@@ -11,6 +15,7 @@ export function uniqueEmail(info: TestInfo, who: string): string {
 export async function signUp(page: Page, name: string, email: string, path = './') {
   await page.goto(path);
   await page.getByRole('button', { name: /New here\?/ }).click();
+  await page.locator('#photo').setInputFiles(PHOTO);
   await page.getByLabel('Your name').fill(name);
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD);

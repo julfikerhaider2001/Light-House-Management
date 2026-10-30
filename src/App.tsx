@@ -6,12 +6,14 @@ import { ToastProvider } from './components/Toast';
 import { t } from './i18n';
 import { CurrentMessContext } from './lib/api/current';
 import { rememberedMess, rememberMess, useMemberships } from './lib/api/mess';
+import { useMyProfile } from './lib/api/profile';
 import { useMessRealtime } from './lib/api/realtime';
 import { useSession } from './lib/api/session';
 import { SessionProvider } from './components/SessionProvider';
 
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
+const AddPhotoPage = lazy(() => import('./pages/AddPhotoPage'));
 const TodayPage = lazy(() => import('./pages/TodayPage'));
 const MealsPage = lazy(() => import('./pages/MealsPage'));
 const MorePage = lazy(() => import('./pages/MorePage'));
@@ -76,9 +78,14 @@ function InMess() {
   const state = useSession();
   const userId = state.status === 'ready' ? state.session?.user.id : undefined;
   const memberships = useMemberships(userId);
+  const profile = useMyProfile(userId);
   const [selected, setSelected] = useState(rememberedMess);
 
-  if (memberships.isPending || !userId) return loading;
+  if (memberships.isPending || profile.isPending || !userId) return loading;
+  // Photos are required; accounts from before that rule add one once.
+  if (profile.data && profile.data.avatar_path === null) {
+    return <AddPhotoPage userId={userId} name={profile.data.display_name} />;
+  }
   if (memberships.isError) return <Navigate to="/auth" replace />;
 
   const list = memberships.data;
