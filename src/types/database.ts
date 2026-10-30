@@ -520,8 +520,8 @@ export type Database = {
         Args: { p_carry?: Json; p_period: string; p_snapshot: Json };
         Returns: string;
       };
-      delete_mess: { Args: { p_confirm_name: string; p_mess: string }; Returns: undefined };
       create_mess: { Args: { p_display_name?: string; p_name?: string }; Returns: Json };
+      delete_mess: { Args: { p_confirm_name: string; p_mess: string }; Returns: undefined };
       expense_items_valid: { Args: { items: Json; total: number }; Returns: boolean };
       gen_invite_code: { Args: Record<PropertyKey, never>; Returns: string };
       get_period_bundle: { Args: { p_mess: string; p_period?: string }; Returns: Json };
