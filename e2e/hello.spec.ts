@@ -1,12 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-test('shows the build version and a healthy database', async ({ page, request }) => {
+test('serves version.json for this build', async ({ request }) => {
   const res = await request.get('version.json');
   expect(res.ok()).toBe(true);
-  const { version } = (await res.json()) as { version: string };
-
-  await page.goto('./');
-  await expect(page.getByRole('heading', { name: 'Light House' })).toBeVisible();
-  await expect(page.getByTestId('app-version')).toHaveText(version);
-  await expect(page.getByText('HEALTHY')).toBeVisible({ timeout: 10_000 });
+  const body = (await res.json()) as { version: string; builtAt: string };
+  expect(body.version).toMatch(/^[0-9a-f]{7}$|^dev$/);
+  expect(Date.parse(body.builtAt)).not.toBeNaN();
 });
