@@ -529,7 +529,11 @@ export type Database = {
       meal_edit_deadline: { Args: { p_date: string; p_mess: string }; Returns: string };
       member_contacts: {
         Args: { p_mess: string };
-        Returns: { display_name: string; email: string; member_id: string }[];
+        Returns: {
+          display_name: string;
+          email: string;
+          member_id: string;
+        }[];
       };
       preview_invite: { Args: { p_code: string }; Returns: Json };
       regenerate_invite_code: { Args: { p_mess: string }; Returns: string };
