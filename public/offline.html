@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#050807" />
+    <title>Light House – offline</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #050807;
+        color: #e8f0ec;
+        font-family: system-ui, sans-serif;
+      }
+      main {
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 24px 16px;
+        box-sizing: border-box;
+      }
+      .card {
+        max-width: 360px;
+        padding: 24px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-top-color: rgba(255, 255, 255, 0.16);
+        text-align: center;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        font-weight: 600;
+      }
+      p {
+        margin: 0 0 20px;
+        color: #8a9a92;
+        line-height: 1.5;
+      }
+      button {
+        font: inherit;
+        color: #e8f0ec;
+        background: transparent;
+        border: 1px solid #22e07a;
+        border-radius: 999px;
+        padding: 10px 22px;
+        box-shadow: 0 0 12px rgba(34, 224, 122, 0.35);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="card">
+        <h1>You're offline</h1>
+        <p>Light House needs a connection to load the latest meals and bills.</p>
+        <button type="button" onclick="location.reload()">Try again</button>
+      </div>
+    </main>
+  </body>
+</html>

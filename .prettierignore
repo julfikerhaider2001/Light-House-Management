@@ -1,0 +1,10 @@
+dist
+dev-dist
+coverage
+android
+design
+playwright-report
+test-results
+.lighthouseci
+supabase/.temp
+package-lock.json
