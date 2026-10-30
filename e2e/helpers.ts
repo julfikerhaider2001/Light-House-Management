@@ -24,7 +24,7 @@ export async function createMess(page: Page) {
 }
 
 export async function inviteCode(page: Page): Promise<string> {
-  await page.goto('./#/more');
+  await page.goto('./#/members');
   const code = page.getByTestId('invite-code');
   await expect(code).toHaveText(/^[A-Z2-9]{8}$/);
   return (await code.textContent())?.trim() ?? '';

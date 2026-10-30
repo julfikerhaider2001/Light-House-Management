@@ -21,6 +21,9 @@ const PaymentsPage = lazy(() => import('./pages/PaymentsPage'));
 const ReportPage = lazy(() => import('./pages/ReportPage'));
 const ClosePage = lazy(() => import('./pages/ClosePage'));
 const ActivityPage = lazy(() => import('./pages/ActivityPage'));
+const MembersPage = lazy(() => import('./pages/MembersPage'));
+const ImportPage = lazy(() => import('./pages/ImportPage'));
+const StatusPage = lazy(() => import('./pages/StatusPage'));
 const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
 
 const loading = <Spinner label={t('common.loading')} />;
@@ -41,6 +44,7 @@ export function App() {
                 }
               />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/status" element={<StatusPage />} />
               <Route
                 path="/*"
                 element={
@@ -107,6 +111,8 @@ function InMess() {
               <Route path="report" element={<ReportPage />} />
               <Route path="close" element={<ClosePage />} />
               <Route path="activity" element={<ActivityPage />} />
+              <Route path="members" element={<MembersPage />} />
+              <Route path="import" element={<ImportPage />} />
               <Route path="more" element={<MorePage />} />
               <Route path="onboarding" element={<OnboardingPage />} />
               <Route path="*" element={<PlaceholderPage />} />
