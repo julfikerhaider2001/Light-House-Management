@@ -212,6 +212,9 @@ export const en = {
     perError: 'Per member',
     sumSettled: 'Σ to pay',
     paidHint: 'Tap a Paid amount to record or correct a payment.',
+    roundingTitle: 'Rounding per person',
+    roundingNote:
+      'Not money anyone paid and nothing to delete. The sheet rounds each total, so together they come out a few taka off; that difference is shared equally so the mess balances to the exact taka.',
     settlementNote:
       'Final is the Google Sheet number. To pay is the same share rounded to whole taka so the mess balances exactly — it is what each person owes, not money already paid. Paid comes from Payments.',
     exportCsv: 'Export CSV',

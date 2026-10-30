@@ -26,7 +26,6 @@ const COLUMNS: [MessageKey, (r: MemberReport) => Fraction, boolean?][] = [
   ['report.extra', (r) => r.extra],
   ['report.final', (r) => r.final],
   ['report.settled', (r) => r.settled],
-  ['report.adjustment', (r) => r.adjustment, true],
   ['report.paid', (r) => r.paid],
   ['report.balance', (r) => r.balance, true],
 ];
@@ -213,6 +212,19 @@ export default function ReportPage() {
             <dt>{t('report.sumSettled')}</dt>
             <dd data-testid="sum-settled">{taka(s.sumSettled)}</dd>
           </div>
+        </dl>
+        <h3 className="h3">{t('report.roundingTitle')}</h3>
+        <p className="muted small">{t('report.roundingNote')}</p>
+        <dl className="kv-list mono">
+          {report.members.map((m) => (
+            <div key={m.memberId}>
+              <dt>{m.name}</dt>
+              <dd>
+                {taka(m.final)} → {taka(m.settled)} ({m.adjustment.toNumber() > 0 ? '+' : ''}
+                {taka(m.adjustment)})
+              </dd>
+            </div>
+          ))}
         </dl>
       </Card>
     </>

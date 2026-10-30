@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App } from './App';
 import { registerSW } from 'virtual:pwa-register';
+import { env } from './lib/env';
+import { watchForNewBuild } from './lib/freshness';
 import { initNative } from './lib/native';
 import './styles/tokens.css';
 
@@ -33,3 +35,5 @@ registerSW({
     if (registration) setInterval(() => void registration.update(), 60 * 60 * 1000);
   },
 });
+
+watchForNewBuild(env.appVersion);
