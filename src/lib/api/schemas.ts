@@ -100,6 +100,8 @@ export const BundleSchema = z.object({
   is_manager: z.boolean(),
   periods: z.array(z.object({ id: uuid, month: date, status: z.enum(['open', 'closed']) })),
   members: z.array(MemberSchema),
+  // Added by the profile-photos migration; optional so older servers still parse.
+  avatars: z.optional(z.array(z.object({ user_id: uuid, avatar_path: z.string() }))),
   meals: z.array(MealSchema),
   expenses: z.array(ExpenseSchema),
   bills: z.array(BillSchema),

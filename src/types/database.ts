@@ -445,6 +445,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          avatar_path: string | null;
           created_at: string;
           display_name: string;
           id: string;
@@ -452,12 +453,14 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          avatar_path?: string | null;
           created_at?: string;
           display_name: string;
           id: string;
           phone?: string | null;
         };
         Update: {
+          avatar_path?: string | null;
           created_at?: string;
           display_name?: string;
           id?: string;
@@ -524,6 +527,14 @@ export type Database = {
         Returns: Json;
       };
       meal_edit_deadline: { Args: { p_date: string; p_mess: string }; Returns: string };
+      member_contacts: {
+        Args: { p_mess: string };
+        Returns: {
+          display_name: string;
+          email: string;
+          member_id: string;
+        }[];
+      };
       preview_invite: { Args: { p_code: string }; Returns: Json };
       regenerate_invite_code: { Args: { p_mess: string }; Returns: string };
       reopen_period: { Args: { p_period: string; p_reason: string }; Returns: undefined };

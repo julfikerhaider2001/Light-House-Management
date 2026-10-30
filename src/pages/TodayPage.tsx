@@ -1,11 +1,13 @@
 import { Link } from 'react-router';
+import { Avatar } from '../components/Avatar';
 import { Stepper } from '../components/Stepper';
 import { Card, Eyebrow, Money, PageHeader, Spinner, StatusPill } from '../components/ui';
 import { useToast } from '../components/toast-context';
 import { t } from '../i18n';
 import { mealsFor, periodMembers, useBundle, useReport, useSetMeal } from '../lib/api/bundle';
 import { useCurrentMess } from '../lib/api/current';
-import { initials, mealCount, taka } from '../lib/format';
+import { useAvatarUrls } from '../lib/api/profile';
+import { mealCount, taka } from '../lib/format';
 import { useNow } from '../lib/useNow';
 import {
   addDays,
@@ -25,6 +27,7 @@ export default function TodayPage() {
   const setMeal = useSetMeal(messId);
   const toast = useToast();
   const now = useNow();
+  const photos = useAvatarUrls(bundle.data);
 
   if (bundle.isPending) return <Spinner label={t('common.loading')} />;
   const b = bundle.data;
@@ -154,9 +157,7 @@ export default function TodayPage() {
           <ul className="list" role="list">
             {members.map((m) => (
               <li key={m.id} className="list-row">
-                <span className="avatar mono" aria-hidden="true">
-                  {initials(m.display_name)}
-                </span>
+                <Avatar name={m.display_name} url={m.user_id ? photos.get(m.user_id) : undefined} />
                 <span className="list-row__name">
                   {m.display_name}
                   {m.id === memberId ? <span className="tag">{t('common.you')}</span> : null}

@@ -10,14 +10,16 @@ export function useSession(): SessionState {
   return useContext(SessionContext);
 }
 
+/** Creates the account (signed in straight away; email confirmation is off) and returns its id. */
 export async function signUp(email: string, password: string, displayName: string) {
   const sb = await getSupabase();
-  const { error } = await sb.auth.signUp({
+  const { data, error } = await sb.auth.signUp({
     email,
     password,
     options: { data: { display_name: displayName } },
   });
   if (error) throw error;
+  return data.user?.id;
 }
 
 export async function signIn(email: string, password: string) {

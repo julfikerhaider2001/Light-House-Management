@@ -12,6 +12,7 @@ import {
   Wallet,
   type LucideIcon,
 } from 'lucide-react';
+import { ProfileCard } from '../components/ProfileCard';
 import { Card, PageHeader } from '../components/ui';
 import { t, type MessageKey } from '../i18n';
 import { useCurrentMess } from '../lib/api/current';
@@ -33,6 +34,7 @@ export default function MorePage() {
   return (
     <>
       <PageHeader eyebrow={t('app.name').toUpperCase()} title={t('nav.more')} />
+      <ProfileCard />
       <Card>
         <ul className="list" role="list">
           {LINKS.map(({ to, label, icon: Icon }) => (

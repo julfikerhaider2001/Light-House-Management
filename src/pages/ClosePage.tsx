@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { ActivityLog } from '../components/ActivityLog';
+import { EmailReportCard } from '../components/EmailReportCard';
 import { useToast } from '../components/toast-context';
 import { Button, Card, Field, PageHeader, Spinner, StatusPill } from '../components/ui';
 import { t } from '../i18n';
@@ -162,6 +163,8 @@ export default function ClosePage() {
           </li>
         ))}
       </ol>
+
+      {closed && isManager ? <EmailReportCard bundle={b} report={report} /> : null}
 
       {closed && isManager ? (
         <Card aria-labelledby="reopen-title">
