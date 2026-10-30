@@ -66,6 +66,9 @@ export default defineConfig({
         navigateFallback: `${BASE}index.html`,
         // version.json must always come from the network.
         navigateFallbackDenylist: [/version\.json$/],
+        // Take over already-open pages at once, so the auto-update reload actually fires.
+        clientsClaim: true,
+        skipWaiting: true,
       },
     }),
   ],
