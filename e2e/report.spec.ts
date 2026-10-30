@@ -107,7 +107,10 @@ test('month report matches the golden fixture', async ({ page }, info) => {
     ).error,
   ).toBeNull();
 
+  // The data was seeded through the API, so load the report fresh: this test checks the
+  // numbers (live updates are covered in mess.spec.ts).
   await page.goto('./#/report');
+  await page.reload();
   await expect(page.getByTestId('meal-rate')).toHaveText('৳92.53');
   await expect(page.getByTestId('final-ayman')).toHaveText('৳5,426');
   await expect(page.getByTestId('final-saad')).toHaveText('৳3,846');
