@@ -1,0 +1,50 @@
+# Daily: close any month that has ended, then email each member their month report.
+# Needs SMTP_USER + SMTP_PASS (a Gmail address and its app password) in the production
+# environment; without them months still close and the run warns that mail is waiting.
+name: Month mail
+
+on:
+  schedule:
+    - cron: '10 18 * * *' # 00:10 Asia/Dhaka, every day
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Compute and log only (no close, no emails)
+        type: boolean
+        default: false
+
+concurrency:
+  group: month-mail
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  mail:
+    name: Close ended months and email reports
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Link production project
+        run: npx supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+      - name: Close ended months and send reports
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          MAIL_FROM_NAME: Light House
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: npx tsx scripts/month-mail.ts

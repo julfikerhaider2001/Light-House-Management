@@ -11,6 +11,7 @@ const ProfileSchema = z.object({
   display_name: z.string(),
   avatar_path: z.nullable(z.string()),
   phone: z.nullable(z.string()),
+  photo_removed: z.optional(z.boolean()),
 });
 export type Profile = z.infer<typeof ProfileSchema>;
 
@@ -24,7 +25,7 @@ export function useMyProfile(userId: string | undefined) {
       const sb = await getSupabase();
       const { data, error } = await sb
         .from('profiles')
-        .select('id, display_name, avatar_path, phone')
+        .select('id, display_name, avatar_path, phone, photo_removed')
         .eq('id', userId ?? '')
         .single();
       if (error) throw error;
@@ -40,9 +41,24 @@ export async function uploadAvatar(userId: string, file: Blob): Promise<string> 
   const path = `${userId}/${crypto.randomUUID()}.webp`;
   const up = await sb.storage.from('avatars').upload(path, blob, { contentType: 'image/webp' });
   if (up.error) throw up.error;
-  const { error } = await sb.from('profiles').update({ avatar_path: path }).eq('id', userId);
+  const { error } = await sb
+    .from('profiles')
+    .update({ avatar_path: path, photo_removed: false })
+    .eq('id', userId);
   if (error) throw error;
   return path;
+}
+
+/** Removes the photo (the stored file too) and remembers it was on purpose. */
+export async function removeAvatar(userId: string, path: string | null): Promise<void> {
+  const sb = await getSupabase();
+  const { error } = await sb
+    .from('profiles')
+    .update({ avatar_path: null, photo_removed: true })
+    .eq('id', userId);
+  if (error) throw error;
+  // Best effort: the profile no longer points at it either way.
+  if (path) await sb.storage.from('avatars').remove([path]);
 }
 
 /** Signed URLs (1 h) for every photo in the bundle, keyed by user id. */

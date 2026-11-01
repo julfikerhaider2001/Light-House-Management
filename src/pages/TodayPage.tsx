@@ -18,8 +18,6 @@ import {
   todayIn,
 } from '../lib/time';
 
-const QUICK = [0, 1, 1.5, 2, 3];
-
 export default function TodayPage() {
   const { messId, memberId } = useCurrentMess();
   const bundle = useBundle(messId);
@@ -50,7 +48,6 @@ export default function TodayPage() {
   const deadline = mealDeadline(target, cutoff, tz).getTime();
   // The cutoff is a reminder: anyone can still change any day while the month is open.
   const pastCutoff = now >= deadline;
-  const mine = mealsFor(b, memberId, target);
   const meRow = report?.members.find((m) => m.memberId === memberId);
   const rate = report?.overview.mealRate.toNumber() ?? 0;
   const inMonth = target.slice(0, 7) === b.period.month.slice(0, 7);
@@ -65,86 +62,68 @@ export default function TodayPage() {
   const members = periodMembers(b).filter((m) => m.status === 'active');
   const total = members.reduce((s, m) => s + mealsFor(b, m.id, target), 0);
 
+  const due = meRow ? meRow.balance.toNumber() : 0;
+  const oldDue = meRow ? meRow.previousBalance.toNumber() : 0;
+
   return (
     <>
-      <PageHeader
-        eyebrow={`${b.mess.name.toUpperCase()} · ${formatDay(today).toUpperCase()}`}
-        title={t('today.title')}
-        aside={
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero__top">
+          <div className="stack-tight">
+            <Eyebrow>{formatDay(today).toUpperCase()}</Eyebrow>
+            <h1 id="hero-title">{t('today.title')}</h1>
+          </div>
           <StatusPill tone={b.period.status === 'open' ? 'ok' : 'idle'}>
             {`${formatMonth(b.period.month).slice(0, 3).toUpperCase()} · ${
               b.period.status === 'open' ? t('common.open') : t('common.closed')
             }`}
           </StatusPill>
-        }
-      />
-
-      <Card className="today-card" aria-labelledby="mine-title">
-        <div className="row-between">
-          <div className="stack-tight">
-            <Eyebrow>{t('today.yourMeals', { date: formatDay(target).toUpperCase() })}</Eyebrow>
-            <h2 id="mine-title" className="h3">
-              {t('today.tomorrow')}
-            </h2>
+        </div>
+        <div className="highlight-grid" data-testid="today-highlights">
+          <div className="highlight highlight--accent">
+            <Eyebrow>{t('today.mealRate')}</Eyebrow>
+            <span className="highlight__value mono" data-testid="today-meal-rate">
+              {taka(rate, 2)}
+            </span>
+            <span className="highlight__sub small muted">
+              {t('today.rateSub', { meals: mealCount(report?.overview.totalMeals ?? 0) })}
+            </span>
           </div>
-          <span className={`mono sync ${setMeal.isPending ? 'sync--busy' : ''}`}>
-            {setMeal.isPending ? t('common.saving') : t('common.saved')}
-          </span>
+          <div className="highlight highlight--info">
+            <Eyebrow>{t('today.myMeals')}</Eyebrow>
+            <span className="highlight__value mono">{mealCount(meRow?.meals.toNumber() ?? 0)}</span>
+            <span className="highlight__sub small muted">
+              {t('today.mealCostSub', { cost: taka(meRow?.mealCost ?? 0, 0) })}
+            </span>
+          </div>
+          <Link to="/report" className="highlight highlight--warn highlight--link">
+            <Eyebrow>{t('today.toPay')}</Eyebrow>
+            {meRow ? <Money className="highlight__value" value={meRow.settled} max={0} /> : '—'}
+            <span className="highlight__sub small muted">{t('today.toPaySub')}</span>
+          </Link>
+          <Link
+            to="/payments"
+            data-testid="today-due"
+            className={`highlight highlight--link ${due > 0 ? 'highlight--due' : 'highlight--accent'}`}
+          >
+            <Eyebrow>{t('today.due')}</Eyebrow>
+            <Money className="highlight__value" value={Math.max(due, 0)} max={0} />
+            <span className="highlight__sub small muted">
+              {due > 0
+                ? t('today.dueSub', { paid: taka(meRow?.paid ?? 0, 0) })
+                : due < 0
+                  ? t('today.extraPaid', { amount: taka(-due, 0) })
+                  : t('today.allClear')}
+            </span>
+          </Link>
         </div>
-        <div className="today-stepper">
-          <Stepper
-            size="lg"
-            testId="my-meals"
-            value={mine}
-            disabled={!inMonth}
-            decLabel={t('today.removeHalf')}
-            incLabel={t('today.addHalf')}
-            onChange={(v) => change(memberId, v)}
-          />
-          <span className="mono muted small">
-            {t('today.approxCost', { cost: taka(Math.ceil(mine * rate), 0) })}
-          </span>
-        </div>
-        <div className="quick" role="group" aria-label={t('today.quickSet')}>
-          {QUICK.map((q) => (
-            <button
-              key={q}
-              type="button"
-              className="quick__chip mono"
-              aria-pressed={mine === q}
-              disabled={!inMonth}
-              onClick={() => change(memberId, q)}
-            >
-              {mealCount(q)}
-            </button>
-          ))}
-        </div>
-        <div className={`notice ${pastCutoff ? 'notice--info' : 'notice--warn'}`}>
-          <span>
-            {pastCutoff
-              ? t('today.pastCutoff', { time: cutoff.slice(0, 5) })
-              : t('today.locksAt', { time: cutoff.slice(0, 5) })}
-          </span>
-          {!pastCutoff ? (
-            <span className="mono notice__aside">{formatCountdown(deadline - now)}</span>
-          ) : null}
-        </div>
-      </Card>
-
-      <div className="stat-row">
-        <Card className="stat">
-          <Eyebrow>{t('today.mealRate')}</Eyebrow>
-          <span className="mono stat__value">{taka(rate, 2)}</span>
-        </Card>
-        <Card className="stat">
-          <Eyebrow>{t('today.myMeals')}</Eyebrow>
-          <span className="mono stat__value">{mealCount(meRow?.meals.toNumber() ?? 0)}</span>
-        </Card>
-        <Link to="/report" className="glass card stat stat--link">
-          <Eyebrow>{t('today.toPay')}</Eyebrow>
-          {meRow ? <Money className="stat__value" value={meRow.settled} max={0} /> : '—'}
-        </Link>
-      </div>
+        {oldDue !== 0 ? (
+          <Link to="/report" className={`notice ${oldDue > 0 ? 'notice--due' : 'notice--info'}`}>
+            <span>{oldDue > 0 ? t('today.oldDue') : t('today.oldCredit')}</span>
+            <span className="mono notice__aside">{taka(Math.abs(oldDue), 0)}</span>
+          </Link>
+        ) : null}
+      </section>
 
       {members.length > 0 ? (
         <Card aria-labelledby="grid-title">
@@ -156,6 +135,16 @@ export default function TodayPage() {
               <span className="tag tag--info">{t('common.manager')}</span>
               <span className="mono muted">Σ {mealCount(total)}</span>
             </span>
+          </div>
+          <div className={`notice ${pastCutoff ? 'notice--info' : 'notice--warn'}`}>
+            <span>
+              {pastCutoff
+                ? t('today.pastCutoff', { time: cutoff.slice(0, 5) })
+                : t('today.locksAt', { time: cutoff.slice(0, 5) })}
+            </span>
+            {!pastCutoff ? (
+              <span className="mono notice__aside">{formatCountdown(deadline - now)}</span>
+            ) : null}
           </div>
           <ul className="list" role="list">
             {members.map((m) => (

@@ -112,12 +112,16 @@ test('month report matches the golden fixture', async ({ page }, info) => {
   await page.goto('./#/report');
   await page.reload();
   await expect(page.getByTestId('meal-rate')).toHaveText('৳92.53');
-  await expect(page.getByTestId('final-ayman')).toHaveText('৳5,426');
-  await expect(page.getByTestId('final-saad')).toHaveText('৳3,846');
-  await expect(page.getByTestId('final-alif')).toHaveText('৳6,810');
-  await expect(page.getByTestId('final-asif')).toHaveText('৳5,331');
-  await expect(page.getByTestId('rent-ayman')).toHaveText('৳4,375');
-  await expect(page.getByTestId('haveToPay-saad')).toHaveText('−৳1,313');
+  await expect(page.getByTestId('final-ayman')).toHaveText('5,426');
+  await expect(page.getByTestId('final-saad')).toHaveText('3,846');
+  await expect(page.getByTestId('final-alif')).toHaveText('6,810');
+  await expect(page.getByTestId('final-asif')).toHaveText('5,331');
+  await expect(page.getByTestId('rent-ayman')).toHaveText('4,375');
+  await expect(page.getByTestId('haveToPay-saad')).toHaveText('−1,313');
   await expect(page.getByTestId('sum-final')).toHaveText('৳21,413');
-  await expect(page.getByTestId('sum-settled')).toHaveText('৳21,410');
+  // Final pay: each final rounded up to the next ৳5 (report_format/format.tex).
+  await expect(page.getByTestId('settled-ayman')).toHaveText('5,430');
+  await expect(page.getByTestId('settled-alif')).toHaveText('6,810');
+  await expect(page.getByTestId('sum-settled')).toHaveText('৳21,425');
+  await expect(page.getByTestId('previous-status-ayman')).toHaveText('Clear');
 });

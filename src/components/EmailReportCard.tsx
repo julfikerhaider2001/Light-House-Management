@@ -9,8 +9,8 @@ import { getSupabase } from '../lib/supabase';
 import { formatMonth } from '../lib/time';
 
 /**
- * After a month is closed the current manager sends the report from their own mail app:
- * every joined member in BCC, the report in the message. Works whoever is manager today.
+ * Closed months are emailed automatically: each joined member gets their own report from the
+ * daily month mailer (scripts/month-mail.ts). Sending from your own mail app stays as a backup.
  */
 export function EmailReportCard({ bundle: b, report }: { bundle: Bundle; report: Report }) {
   const contacts = useQuery({
@@ -36,9 +36,18 @@ export function EmailReportCard({ bundle: b, report }: { bundle: Bundle; report:
       <h2 id="email-title" className="h3">
         {t('close.emailTitle')}
       </h2>
-      <p className="muted small">{t('close.emailBody')}</p>
+      <p className="muted small">{t('close.emailAuto')}</p>
+      <p
+        className={`notice ${b.period.emailed_at ? 'notice--info' : 'notice--warn'}`}
+        data-testid="email-status"
+      >
+        {b.period.emailed_at
+          ? t('close.emailSent', { date: b.period.emailed_at.slice(0, 10) })
+          : t('close.emailPending')}
+      </p>
+      {emails.length > 0 ? <p className="muted small">{t('close.emailManual')}</p> : null}
       {emails.length > 0 ? (
-        <a className="btn btn--primary btn--block" href={href} data-testid="email-report">
+        <a className="btn btn--block" href={href} data-testid="email-report">
           <span className="row">
             <Mail size={18} strokeWidth={1.5} aria-hidden="true" />
             {t('close.emailButton', { count: emails.length })}

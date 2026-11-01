@@ -7,7 +7,10 @@ import {
   ClipboardCheck,
   LayoutGrid,
   Menu,
+  Moon,
+  Palette,
   Settings,
+  Sun,
   UserRound,
   ReceiptText,
   ShoppingBag,
@@ -16,6 +19,10 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { t, type MessageKey } from '../i18n';
+import { useBundle } from '../lib/api/bundle';
+import { useCurrentMess } from '../lib/api/current';
+import { toggleMode, useTheme } from '../lib/theme';
+import { formatMonth } from '../lib/time';
 
 interface NavItem {
   to: string;
@@ -39,6 +46,7 @@ const SIDEBAR_EXTRA: NavItem[] = [
   { to: '/activity', label: 'nav.activity', icon: Activity },
   { to: '/members', label: 'nav.members', icon: Users },
   { to: '/settings', label: 'nav.settings', icon: Settings },
+  { to: '/appearance', label: 'nav.appearance', icon: Palette },
   { to: '/profile', label: 'nav.profile', icon: UserRound },
 ];
 
@@ -52,7 +60,59 @@ function Item({ item, variant }: { item: NavItem; variant: 'tab' | 'side' }) {
   );
 }
 
-/** Translucent chrome over scrolling content: bottom tabs on phones, sidebar on desktop. */
+/** Light/dark switch, on every screen. */
+export function ThemeToggle() {
+  const { resolved } = useTheme();
+  const Icon = resolved === 'dark' ? Sun : Moon;
+  return (
+    <button
+      type="button"
+      className="theme-toggle"
+      aria-label={resolved === 'dark' ? t('theme.toLight') : t('theme.toDark')}
+      title={resolved === 'dark' ? t('theme.toLight') : t('theme.toDark')}
+      onClick={toggleMode}
+    >
+      <Icon size={20} strokeWidth={1.75} aria-hidden="true" />
+    </button>
+  );
+}
+
+/** The mess name and month at the top of every screen, clear of the status bar. */
+function AppBar() {
+  const { messId, memberships } = useCurrentMess();
+  const bundle = useBundle(messId);
+  const name = memberships.find((m) => m.mess_id === messId)?.messes.name ?? t('app.name');
+  const period = bundle.data?.period;
+  const active = bundle.data?.members.filter((m) => m.status === 'active').length;
+  return (
+    <header className="appbar">
+      <div className="appbar__inner">
+        <span className="appbar__logo" aria-hidden="true">
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width="24" height="24" />
+        </span>
+        <div className="appbar__text">
+          <strong className="appbar__name" data-testid="appbar-mess">
+            {name}
+          </strong>
+          <span className="appbar__meta mono">
+            {period ? (
+              <>
+                {formatMonth(period.month)} ·{' '}
+                <b>{period.status === 'open' ? t('common.open') : t('common.closed')}</b>
+                {active ? ` · ${t('appbar.members', { count: active })}` : ''}
+              </>
+            ) : (
+              t('app.tagline')
+            )}
+          </span>
+        </div>
+        <ThemeToggle />
+      </div>
+    </header>
+  );
+}
+
+/** App bar on top, the page scrolling in between, tabs at the bottom (sidebar on desktop). */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="app">
@@ -65,10 +125,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           (item) => item && <Item key={item.to} item={item} variant="side" />,
         )}
       </nav>
-      <main className="content" id="main">
-        {children}
+      <AppBar />
+      <main className="scroll" id="main">
+        <div className="content">{children}</div>
       </main>
-      <nav className="tabbar glass" aria-label={t('nav.primary')}>
+      <nav className="tabbar" aria-label={t('nav.primary')}>
         {TABS.map((item) => (
           <Item key={item.to} item={item} variant="tab" />
         ))}

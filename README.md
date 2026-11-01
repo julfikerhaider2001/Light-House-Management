@@ -96,13 +96,14 @@ Other workflows:
 
 - **Keepalive** (daily) calls `health()` so the free project never pauses.
 - **Backup** (weekly) makes an encrypted data dump, kept as an artifact for 30 days.
+- **Month mail** (daily, 00:10 Dhaka) closes any month that has ended but is still open, then emails every joined member their own month report (`scripts/month-mail.ts`, using the app's calc engine and RPCs). Run it by hand with **Actions → Month mail → Run workflow** (tick _dry run_ to only log).
 - **Dependabot** checks npm and Actions weekly.
 
 Migrations are forward-only and backward-compatible (expand, then contract), so rolling back means redeploying an earlier commit: **Actions → Deploy → Run workflow**.
 
 ### Secrets (GitHub Actions)
 
-`SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `BACKUP_PASSPHRASE`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
+`SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `BACKUP_PASSPHRASE`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, `SMTP_USER`, `SMTP_PASS` (a Gmail address and its [app password](https://myaccount.google.com/apppasswords), for Month mail; optional `SMTP_HOST`/`SMTP_PORT` for another provider).
 
 Only the publishable key reaches the frontend; it is public by design. The secret/service key is never used by the app or stored in the repo. The Android keystore and its passwords are kept offline by the owner; losing them means existing installs can't be updated.
 

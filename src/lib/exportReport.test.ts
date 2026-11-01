@@ -12,12 +12,13 @@ describe('reportCsv', () => {
     expect(lines.filter((l) => /^(Ayman|Saad|Alif|Asif),/.test(l))).toHaveLength(4);
   });
 
-  it('writes the sheet-compatible final and settled values', () => {
+  it('writes the calculated final and the rounded final pay', () => {
     const ayman = lines.find((l) => l.startsWith('Ayman,'))?.split(',') ?? [];
     const header = lines[0]?.split(',') ?? [];
     expect(ayman[header.indexOf('Final')]).toBe('5426');
     expect(ayman[header.indexOf('Initial')]).toBe('-53.75');
-    expect(csv).toContain('Sum final (sheet-compatible),21413');
-    expect(csv).toContain('Sum settled,21410');
+    expect(ayman[header.indexOf('Final Pay')]).toBe('5430');
+    expect(csv).toContain('Sum final (calculated),21413');
+    expect(csv).toContain('Sum final pay (rounded up to 5),21425');
   });
 });

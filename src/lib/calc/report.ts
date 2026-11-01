@@ -20,6 +20,9 @@ const BILL_KINDS: readonly BillKind[] = [
   'other',
 ];
 
+/** Final pay is rounded up to a round figure: the next multiple of ৳5. */
+export const ROUND_UP_TO = 5;
+
 /** Per-member running totals gathered from the period's rows. */
 interface Tally {
   member: CalcMember;
@@ -27,28 +30,39 @@ interface Tally {
   bazar: Fraction;
   bazarTrips: number;
   initialPaid: Fraction;
+  initialTrips: number;
   fixedRent: Fraction | null;
   previousDue: Fraction;
   paid: Fraction;
+  previousPaid: Fraction;
 }
 
 /**
- * Replicates the mess Google Sheet. Single source of truth for every number the app shows,
- * the month-close snapshot and the dues carried forward.
+ * Replicates the mess sheet's Payment Summary. Single source of truth for every number the app
+ * shows, the month-close snapshot, the month emails and the dues carried forward.
+ *
+ * Each month stands alone: a previous due is reported (and paid) separately and never mixed
+ * into this month's bill, so bazar done this month cannot hide an unpaid old due.
  */
 export function computeReport(input: CalcInput): Report {
-  const tallies: Tally[] = input.members.map((member) => ({
+  const tally = (member: CalcMember): Tally => ({
     member,
     meals: Fraction.ZERO,
     bazar: Fraction.ZERO,
     bazarTrips: 0,
     initialPaid: Fraction.ZERO,
+    initialTrips: 0,
     fixedRent: null,
     previousDue: Fraction.ZERO,
     paid: Fraction.ZERO,
-  }));
-  // Rows for anyone outside the period's members are ignored.
+    previousPaid: Fraction.ZERO,
+  });
+  const tallies = input.members.map(tally);
+  const formerTallies = (input.formerMembers ?? []).map(tally);
+  // Former members only carry dues and payments; any other row of theirs is ignored, as are
+  // rows for anyone outside the period.
   const byId = new Map(tallies.map((t) => [t.member.id, t]));
+  const withFormer = new Map([...formerTallies.map((t) => [t.member.id, t] as const), ...byId]);
   const eatingDays = new Set<string>();
 
   for (const e of input.meals) {
@@ -66,6 +80,7 @@ export function computeReport(input: CalcInput): Report {
       t.bazarTrips += 1;
     } else {
       t.initialPaid = t.initialPaid.add(Fraction.from(x.amount));
+      t.initialTrips += 1;
     }
   }
   for (const r of input.rentShares ?? []) {
@@ -73,12 +88,15 @@ export function computeReport(input: CalcInput): Report {
     if (t && r.fixedAmount !== null) t.fixedRent = Fraction.from(r.fixedAmount);
   }
   for (const d of input.previousDues ?? []) {
-    const t = byId.get(d.memberId);
+    const t = withFormer.get(d.memberId);
     if (t) t.previousDue = t.previousDue.add(Fraction.from(d.amount));
   }
   for (const p of input.payments ?? []) {
-    const t = byId.get(p.memberId);
-    if (t) t.paid = t.paid.add(Fraction.from(p.amount));
+    const t = withFormer.get(p.memberId);
+    if (!t) continue;
+    if (p.appliesTo === 'previous_due')
+      t.previousPaid = t.previousPaid.add(Fraction.from(p.amount));
+    else t.paid = t.paid.add(Fraction.from(p.amount));
   }
 
   const bills = Object.fromEntries(BILL_KINDS.map((k) => [k, Fraction.ZERO])) as Record<
@@ -91,7 +109,6 @@ export function computeReport(input: CalcInput): Report {
   const totalMeals = sumOf((t) => t.meals);
   const totalBazar = sumOf((t) => t.bazar);
   const totalInitial = sumOf((t) => t.initialPaid);
-  const totalPreviousDue = sumOf((t) => t.previousDue);
   const active = tallies.length;
   const perHead = (total: Fraction) =>
     active === 0 ? Fraction.ZERO : total.div(Fraction.of(active));
@@ -112,22 +129,26 @@ export function computeReport(input: CalcInput): Report {
       ? Fraction.ZERO
       : bills.house_rent.sub(fixedTotal).div(Fraction.of(flexibleCount)).round(0);
 
-  const rows = tallies.map((t) => {
+  const row = (t: Tally, shares: boolean): MemberReport => {
+    const share = (x: Fraction) => (shares ? x : Fraction.ZERO);
     const mealCost = Fraction.of(t.meals.mul(mealRate).ceil());
     const haveToPay = mealCost.sub(t.bazar);
-    const rent = t.fixedRent ?? flexibleRent;
-    const initialDue = initialShare.sub(t.initialPaid);
+    const rent = share(t.fixedRent ?? flexibleRent);
+    const initialDue = share(initialShare).sub(t.initialPaid);
     const total = Fraction.sum([
       haveToPay,
-      khala,
+      share(khala),
       rent,
-      wifi,
-      gas,
-      electricity,
-      other,
+      share(wifi),
+      share(gas),
+      share(electricity),
+      share(other),
       initialDue,
-      t.previousDue,
     ]).round(0);
+    const final = total.add(share(extra));
+    const settled = roundUp(final);
+    const balance = settled.sub(t.paid);
+    const previousBalance = t.previousDue.sub(t.previousPaid);
     return {
       memberId: t.member.id,
       name: t.member.name,
@@ -136,41 +157,46 @@ export function computeReport(input: CalcInput): Report {
       initialPaid: t.initialPaid,
       mealCost,
       haveToPay,
-      khala,
+      khala: share(khala),
       rent,
-      wifi,
-      gas,
-      electricity,
-      other,
+      wifi: share(wifi),
+      gas: share(gas),
+      electricity: share(electricity),
+      other: share(other),
       initialDue,
-      previousDue: t.previousDue,
       total,
-      extra,
-      final: total.add(extra),
-      paid: t.paid,
-    };
-  });
-
-  const target = Fraction.sum([...BILL_KINDS.map((k) => bills[k]), totalPreviousDue]);
-  const sumFinal = Fraction.sum(rows.map((r) => r.final));
-  const error = sumFinal.sub(target);
-  const perError = perHead(error);
-
-  const members: MemberReport[] = allocate(rows, (r) => r.final.sub(perError), target).map(
-    ({ item: r, value: settled }) => ({
-      ...r,
+      extra: share(extra),
+      final,
       settled,
-      adjustment: settled.sub(r.final),
-      balance: settled.sub(r.paid),
-    }),
-  );
+      adjustment: settled.sub(final),
+      paid: t.paid,
+      balance,
+      previousDue: t.previousDue,
+      previousPaid: t.previousPaid,
+      previousBalance,
+      carry: balance.add(previousBalance),
+    };
+  };
+  const members = tallies.map((t) => row(t, true));
+  const former = formerTallies.map((t) => row(t, false));
 
+  const target = Fraction.sum(BILL_KINDS.map((k) => bills[k]));
+  const total = (pick: (m: MemberReport) => Fraction) => Fraction.sum(members.map(pick));
+  const everyone = (pick: (m: MemberReport) => Fraction) =>
+    Fraction.sum([...members, ...former].map(pick));
+  const sumFinal = total((m) => m.final);
+  const sumSettled = total((m) => m.settled);
   const settlement: Settlement = {
     target,
     sumFinal,
-    error,
-    perError,
-    sumSettled: Fraction.sum(members.map((m) => m.settled)),
+    error: sumFinal.sub(target),
+    sumSettled,
+    roundingExtra: sumSettled.sub(sumFinal),
+    sumPaid: total((m) => m.paid),
+    sumBalance: total((m) => m.balance),
+    sumPreviousDue: everyone((m) => m.previousDue),
+    sumPreviousPaid: everyone((m) => m.previousPaid),
+    sumPreviousBalance: everyone((m) => m.previousBalance),
   };
 
   const overview: Overview = {
@@ -182,43 +208,23 @@ export function computeReport(input: CalcInput): Report {
     mealRateRounded: mealRate.round(0),
     bazarRate: perHead(totalBazar),
     initialRate: initialShare,
-    totalMealCost: Fraction.sum(members.map((m) => m.mealCost)),
+    totalMealCost: total((m) => m.mealCost),
     khalaCount: eatingDays.size,
     mostMeals: leader(tallies, (t) => t.meals),
     mostBazar: leader(tallies, (t) => t.bazar),
     mostBazarTrips: leader(tallies, (t) => Fraction.of(t.bazarTrips)),
     mostInitial: leader(tallies, (t) => t.initialPaid),
+    mostInitialTrips: leader(tallies, (t) => Fraction.of(t.initialTrips)),
     mostTotalSpend: leader(tallies, (t) => t.bazar.add(t.initialPaid)),
   };
 
-  return { members, overview, settlement, bills };
+  return { members, former, overview, settlement, bills };
 }
 
-/**
- * Splits `target` into whole taka across items whose bases sum to `target`: floor every
- * base, then hand the leftover taka to the largest fractional remainders. Ties go to the
- * earlier item so the result is stable. A fractional target settles to its whole-taka floor.
- */
-export function allocate<T>(
-  items: readonly T[],
-  base: (item: T) => Fraction,
-  target: Fraction,
-): { item: T; value: Fraction }[] {
-  const entries = items.map((item, index) => {
-    const b = base(item);
-    const floor = b.floor();
-    return { item, index, floor, remainder: b.sub(Fraction.of(floor)) };
-  });
-  const leftover = Number(target.floor() - entries.reduce((s, e) => s + e.floor, 0n));
-  const winners = new Set(
-    [...entries]
-      .sort((a, b) => b.remainder.cmp(a.remainder) || a.index - b.index)
-      .slice(0, Math.max(0, leftover)),
-  );
-  return entries.map((e) => ({
-    item: e.item,
-    value: Fraction.of(winners.has(e) ? e.floor + 1n : e.floor),
-  }));
+/** Rounds up to the next multiple of ROUND_UP_TO (5329 → 5330, 5896 → 5900, −467 → −465). */
+export function roundUp(value: Fraction): Fraction {
+  const step = BigInt(ROUND_UP_TO);
+  return Fraction.of(value.div(Fraction.of(step)).ceil() * step);
 }
 
 function leader(tallies: readonly Tally[], pick: (t: Tally) => Fraction): Leader | null {

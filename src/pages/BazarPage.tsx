@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Camera, Plus, X } from 'lucide-react';
+import { Camera, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { Sheet } from '../components/Sheet';
 import { SwipeRow } from '../components/SwipeRow';
 import { useToast } from '../components/toast-context';
@@ -8,7 +8,7 @@ import { t } from '../i18n';
 import { periodMembers, useBundle } from '../lib/api/bundle';
 import { useCurrentMess } from '../lib/api/current';
 import type { Bundle, Expense } from '../lib/api/schemas';
-import { addExpense, setDeleted, useMessMutation } from '../lib/api/writes';
+import { addExpense, setDeleted, updateExpense, useMessMutation } from '../lib/api/writes';
 import { Fraction } from '../lib/calc/fraction';
 import { taka } from '../lib/format';
 import { compressImage } from '../lib/image';
@@ -22,6 +22,7 @@ export default function BazarPage() {
   const remove = useMessMutation(messId, setDeleted);
   const toast = useToast();
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<Expense | null>(null);
 
   if (bundle.isPending) return <Spinner label={t('common.loading')} />;
   const b = bundle.data;
@@ -58,6 +59,7 @@ export default function BazarPage() {
         title={t('bazar.title')}
       />
       <Card aria-label={t('bazar.title')} className={open ? 'has-fab' : ''}>
+        {open && list.length > 0 ? <p className="muted small">{t('bazar.actionsHint')}</p> : null}
         {list.length === 0 ? (
           <EmptyState>{t('bazar.empty')}</EmptyState>
         ) : (
@@ -72,23 +74,59 @@ export default function BazarPage() {
                     onDelete={() => del(e)}
                     deleteLabel={t('bazar.delete', { what: `${who} ${taka(e.amount)}` })}
                   >
-                    <div className="expense">
-                      <div className="expense__main">
-                        <span className="row">
-                          <Tag tone={e.kind === 'bazar' ? 'ok' : 'info'}>
-                            {e.kind === 'bazar' ? 'BAZAR' : 'INITIAL'}
-                          </Tag>
-                          <strong>{who}</strong>
+                    <div className="expense expense--actions">
+                      <button
+                        type="button"
+                        className="expense__open"
+                        disabled={!open}
+                        aria-label={t('bazar.edit', { what: `${who} ${taka(e.amount)}` })}
+                        onClick={() => setEditing(e)}
+                      >
+                        <div className="expense__main">
+                          <span className="row">
+                            <Tag tone={e.kind === 'bazar' ? 'ok' : 'info'}>
+                              {e.kind === 'bazar' ? 'BAZAR' : 'INITIAL'}
+                            </Tag>
+                            <strong>{who}</strong>
+                          </span>
+                          <span className="muted small mono">
+                            {formatDay(e.date)}
+                            {e.items.length > 0
+                              ? ` · ${e.items.map((i) => `${i.name}-${i.amount}`).join(', ')}`
+                              : ''}
+                            {e.note ? ` · ${e.note}` : ''}
+                          </span>
+                        </div>
+                        <Money value={e.amount} />
+                      </button>
+                      {open ? (
+                        <span className="expense__tools">
+                          <button
+                            type="button"
+                            className="icon-btn icon-btn--sm"
+                            aria-hidden="true"
+                            tabIndex={-1}
+                            onClick={() => setEditing(e)}
+                          >
+                            <Pencil size={16} strokeWidth={1.75} />
+                          </button>
+                          <button
+                            type="button"
+                            className="icon-btn icon-btn--sm icon-btn--danger"
+                            aria-label={t('bazar.delete', { what: `${who} ${taka(e.amount)}` })}
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  t('bazar.deleteConfirm', { what: `${who} ${taka(e.amount)}` }),
+                                )
+                              )
+                                del(e);
+                            }}
+                          >
+                            <Trash2 size={16} strokeWidth={1.75} aria-hidden="true" />
+                          </button>
                         </span>
-                        <span className="muted small mono">
-                          {formatDay(e.date)}
-                          {e.items.length > 0
-                            ? ` · ${e.items.map((i) => `${i.name}-${i.amount}`).join(', ')}`
-                            : ''}
-                          {e.note ? ` · ${e.note}` : ''}
-                        </span>
-                      </div>
-                      <Money value={e.amount} />
+                      ) : null}
                     </div>
                   </SwipeRow>
                 </div>
@@ -97,7 +135,7 @@ export default function BazarPage() {
           </div>
         )}
       </Card>
-      {open && !adding ? (
+      {open && !adding && !editing ? (
         <button type="button" className="fab" onClick={() => setAdding(true)}>
           <Plus size={20} strokeWidth={1.75} aria-hidden="true" />
           {t('bazar.add')}
@@ -110,6 +148,20 @@ export default function BazarPage() {
             messId={messId}
             memberId={memberId}
             onDone={() => setAdding(false)}
+          />
+        ) : null}
+      </Sheet>
+      <Sheet open={editing !== null} title={t('bazar.editTitle')} onClose={() => setEditing(null)}>
+        {editing ? (
+          <ExpenseForm
+            bundle={b}
+            messId={messId}
+            memberId={memberId}
+            existing={editing}
+            onDone={() => {
+              setEditing(null);
+              toast.show(t('bazar.updated'));
+            }}
           />
         ) : null}
       </Sheet>
@@ -129,23 +181,35 @@ function ExpenseForm({
   bundle: b,
   messId,
   memberId,
+  existing,
   onDone,
 }: {
   bundle: Bundle;
   messId: string;
   memberId: string;
+  existing?: Expense;
   onDone: () => void;
 }) {
   const save = useMessMutation(messId, addExpense);
+  const change = useMessMutation(messId, updateExpense);
   const toast = useToast();
   const today = todayIn(b.mess.timezone);
   const month = b.period.month.slice(0, 7);
-  const [kind, setKind] = useState<'bazar' | 'initial'>('bazar');
-  const [date, setDate] = useState(today.startsWith(month) ? today : b.period.month);
-  const [payer, setPayer] = useState(memberId);
-  const [items, setItems] = useState<ItemRow[]>([]);
-  const [total, setTotal] = useState('');
-  const [note, setNote] = useState('');
+  const [kind, setKind] = useState<'bazar' | 'initial'>(existing?.kind ?? 'bazar');
+  const [date, setDate] = useState(
+    existing?.date ?? (today.startsWith(month) ? today : b.period.month),
+  );
+  const [payer, setPayer] = useState(existing?.member_id ?? memberId);
+  const [items, setItems] = useState<ItemRow[]>(
+    () =>
+      existing?.items.map((i, idx) => ({
+        key: -1 - idx,
+        name: i.name,
+        amount: String(i.amount),
+      })) ?? [],
+  );
+  const [total, setTotal] = useState(existing ? String(existing.amount) : '');
+  const [note, setNote] = useState(existing?.note ?? '');
   const [photo, setPhoto] = useState<File | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -164,7 +228,9 @@ function ExpenseForm({
     date: !dateOk ? t('bazar.dateOutside', { month: formatMonth(b.period.month) }) : undefined,
   };
   const valid = !errors.items && !errors.amount && !errors.date;
-  const members = periodMembers(b).filter((m) => m.status === 'active');
+  const members = periodMembers(b).filter(
+    (m) => m.status === 'active' || m.id === existing?.member_id,
+  );
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -183,8 +249,7 @@ function ExpenseForm({
         if (error) throw error;
         receiptPath = path;
       }
-      await save.mutateAsync({
-        periodId: b.period.id,
+      const entry = {
         memberId: payer,
         date,
         amount: Number(amountText),
@@ -192,7 +257,12 @@ function ExpenseForm({
         items: items.map((i) => ({ name: i.name.trim(), amount: Number(i.amount.trim()) })),
         ...(note.trim() ? { note: note.trim() } : {}),
         ...(receiptPath ? { receiptPath } : {}),
-      });
+      };
+      if (existing) {
+        await change.mutateAsync({ ...entry, id: existing.id, keepReceipt: existing.receipt_path });
+      } else {
+        await save.mutateAsync({ ...entry, periodId: b.period.id });
+      }
       haptic('success');
       onDone();
     } catch (err) {

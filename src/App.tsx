@@ -28,6 +28,7 @@ const ImportPage = lazy(() => import('./pages/ImportPage'));
 const StatusPage = lazy(() => import('./pages/StatusPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const AppearancePage = lazy(() => import('./pages/AppearancePage'));
 const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
 
 const loading = <Spinner label={t('common.loading')} />;
@@ -84,8 +85,9 @@ function InMess() {
   const [selected, setSelected] = useState(rememberedMess);
 
   if (memberships.isPending || profile.isPending || !userId) return loading;
-  // Photos are required; accounts from before that rule add one once.
-  if (profile.data && profile.data.avatar_path === null) {
+  // Photos are required; accounts from before that rule add one once. Someone who removed
+  // their photo on purpose is not asked again.
+  if (profile.data && profile.data.avatar_path === null && !profile.data.photo_removed) {
     return <AddPhotoPage userId={userId} name={profile.data.display_name} />;
   }
   if (memberships.isError) return <Navigate to="/auth" replace />;
@@ -126,6 +128,7 @@ function InMess() {
               <Route path="more" element={<MorePage />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="appearance" element={<AppearancePage />} />
               <Route path="onboarding" element={<OnboardingPage />} />
               <Route path="*" element={<PlaceholderPage />} />
             </Routes>

@@ -12,23 +12,26 @@ const COLUMNS: [string, (r: Report['members'][number]) => Fraction][] = [
   ['Gas', (r) => r.gas],
   ['Electricity', (r) => r.electricity],
   ['Other', (r) => r.other],
+  ['Init. Cost', (r) => r.initialPaid],
   ['Initial', (r) => r.initialDue],
-  ['Previous Due', (r) => r.previousDue],
-  ['Total', (r) => r.total],
+  ['Sub-total', (r) => r.total],
   ['Extra', (r) => r.extra],
   ['Final', (r) => r.final],
-  ['Settled', (r) => r.settled],
-  ['Adjustment', (r) => r.adjustment],
+  ['Final Pay', (r) => r.settled],
+  ['Rounding', (r) => r.adjustment],
   ['Paid', (r) => r.paid],
-  ['Balance', (r) => r.balance],
+  ['Still Due', (r) => r.balance],
+  ['Previous Due', (r) => r.previousDue],
+  ['Previous Paid', (r) => r.previousPaid],
+  ['Previous Left', (r) => r.previousBalance],
 ];
 
 const cell = (text: string) => (/[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text);
 
-/** The month report as CSV, one row per member plus a totals row. */
+/** The month report as CSV, one row per member (former members with dues last) plus totals. */
 export function reportCsv(report: Report): string {
   const header = ['Member', ...COLUMNS.map(([name]) => name)];
-  const rows = report.members.map((r) => [
+  const rows = [...report.members, ...report.former].map((r) => [
     r.name,
     ...COLUMNS.map(([, pick]) => pick(r).toFixed(2).replace(/\.00$/, '')),
   ]);
@@ -40,9 +43,10 @@ export function reportCsv(report: Report): string {
     ['Total meals', o.totalMeals.toFixed(1)],
     ['Total bazar', o.totalBazar.toFixed(2)],
     ['Khala count', String(o.khalaCount)],
-    ['Sum final (sheet-compatible)', s.sumFinal.toFixed(2)],
-    ['Sum settled', s.sumSettled.toFixed(2)],
-    ['Rounding error', s.error.toFixed(2)],
+    ['Sum final (calculated)', s.sumFinal.toFixed(2)],
+    ['Sum final pay (rounded up to 5)', s.sumSettled.toFixed(2)],
+    ['Rounding added', s.roundingExtra.toFixed(2)],
+    ['Previous due left', s.sumPreviousBalance.toFixed(2)],
   ];
   return [header, ...rows, ...summary].map((r) => r.map(cell).join(',')).join('\r\n') + '\r\n';
 }
