@@ -328,7 +328,7 @@ export default function ReportPage() {
                       )}
                     </td>
                   ))}
-                  <td className="report-total-col" data-testid={`sum-${l.key}`}>
+                  <td className="report-total-col" data-testid={`total-${l.key}`}>
                     {l.key === 'meals' ? (
                       mealCount(sum(l.pick))
                     ) : (
