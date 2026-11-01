@@ -17,6 +17,8 @@ import {
 } from '../components/ui';
 import { t } from '../i18n';
 import { periodMembers, useBundle, useReport } from '../lib/api/bundle';
+import type { MemberReport, PaymentTarget, Report } from '../lib/calc';
+import { formerMembers } from '../lib/calcInput';
 import { useCurrentMess } from '../lib/api/current';
 import type { Bundle, Payment } from '../lib/api/schemas';
 import {
@@ -87,9 +89,10 @@ export default function PaymentsPage() {
           {t('payments.balance')}
         </h2>
         <ul className="list" role="list">
-          {report.members.map((r) => {
+          {[...report.members, ...report.former].map((r) => {
             const owes = r.balance.toNumber() > 0;
             const credit = r.balance.toNumber() < 0;
+            const old = r.previousBalance.toNumber();
             return (
               <li key={r.memberId}>
                 <button
@@ -98,7 +101,14 @@ export default function PaymentsPage() {
                   disabled={!open}
                   onClick={() => setAdding(r.memberId)}
                 >
-                  <span className="list-row__name">{r.name}</span>
+                  <span className="list-row__name stack-tight">
+                    {r.name}
+                    {old > 0 ? (
+                      <span className="small money--due mono">
+                        {t('payments.previousLeft', { amount: taka(old, 0) })}
+                      </span>
+                    ) : null}
+                  </span>
                   <span className="mono muted small">
                     {taka(r.paid, 0)} / {taka(r.settled, 0)}
                   </span>
@@ -140,6 +150,9 @@ export default function PaymentsPage() {
                       <div className="expense__main">
                         <span className="row">
                           <Tag tone="info">{t(`payments.${p.method}`).toUpperCase()}</Tag>
+                          {p.applies_to === 'previous_due' ? (
+                            <Tag tone="warn">{t('payments.previousTag')}</Tag>
+                          ) : null}
                           <strong>{who}</strong>
                         </span>
                         <span className="muted small mono">
@@ -163,10 +176,7 @@ export default function PaymentsPage() {
             bundle={b}
             messId={messId}
             initialMember={adding || (periodMembers(b)[0]?.id ?? '')}
-            suggested={(id) => {
-              const r = report.members.find((m) => m.memberId === id);
-              return r && r.balance.toNumber() > 0 ? r.balance.toNumber() : null;
-            }}
+            report={report}
             onDone={() => setAdding(null)}
           />
         ) : null}
@@ -182,7 +192,7 @@ export default function PaymentsPage() {
             messId={messId}
             initialMember={editing.member_id}
             existing={editing}
-            suggested={() => null}
+            report={report}
             onDone={() => setEditing(null)}
           />
         ) : null}
@@ -196,24 +206,41 @@ function PaymentForm({
   messId,
   initialMember,
   existing,
-  suggested,
+  report,
   onDone,
 }: {
   bundle: Bundle;
   messId: string;
   initialMember: string;
   existing?: Payment;
-  suggested: (memberId: string) => number | null;
+  report: Report;
   onDone: () => void;
 }) {
+  const rowOf = (id: string): MemberReport | undefined =>
+    [...report.members, ...report.former].find((m) => m.memberId === id);
+  // New payments default to whatever is owed: this month first, else the old due.
+  const defaultTarget = (id: string): PaymentTarget => {
+    const r = rowOf(id);
+    return r && r.balance.toNumber() <= 0 && r.previousBalance.toNumber() > 0
+      ? 'previous_due'
+      : 'month';
+  };
+  const suggested = (id: string, target: PaymentTarget): number | null => {
+    const r = rowOf(id);
+    const left = target === 'month' ? r?.balance : r?.previousBalance;
+    return left && left.toNumber() > 0 ? left.toNumber() : null;
+  };
   const save = useMessMutation(messId, addPayment);
   const change = useMessMutation(messId, updatePayment);
   const toast = useToast();
   const today = todayIn(b.mess.timezone);
   const month = b.period.month.slice(0, 7);
   const [member, setMember] = useState(initialMember);
+  const [target, setTarget] = useState<PaymentTarget>(
+    () => existing?.applies_to ?? defaultTarget(initialMember),
+  );
   const [amount, setAmount] = useState(() =>
-    existing ? String(existing.amount) : String(suggested(initialMember) ?? ''),
+    existing ? String(existing.amount) : String(suggested(initialMember, target) ?? ''),
   );
   const [method, setMethod] = useState<PaymentMethod>(existing?.method ?? 'bkash');
   const [date, setDate] = useState(
@@ -246,6 +273,7 @@ function PaymentForm({
           amount: Number(amount.trim()),
           method,
           date,
+          appliesTo: target,
           ...(note.trim() ? { note: note.trim() } : {}),
         },
         done,
@@ -259,6 +287,7 @@ function PaymentForm({
         amount: Number(amount.trim()),
         method,
         date,
+        appliesTo: target,
         ...(note.trim() ? { note: note.trim() } : {}),
       },
       {
@@ -279,18 +308,43 @@ function PaymentForm({
           value={member}
           disabled={existing !== undefined}
           onChange={(e) => {
+            const next = defaultTarget(e.target.value);
             setMember(e.target.value);
-            const s = suggested(e.target.value);
+            setTarget(next);
+            const s = suggested(e.target.value, next);
             if (s !== null) setAmount(String(s));
           }}
         >
-          {periodMembers(b).map((m) => (
+          {[...periodMembers(b), ...formerMembers(b)].map((m) => (
             <option key={m.id} value={m.id}>
               {m.display_name}
             </option>
           ))}
         </select>
       </Field>
+      <div className="stack-tight">
+        <span className="field-label" id="pay-target">
+          {t('payments.appliesTo')}
+        </span>
+        <div className="segmented" role="radiogroup" aria-labelledby="pay-target">
+          {(['month', 'previous_due'] as const).map((k) => (
+            <button
+              key={k}
+              type="button"
+              role="radio"
+              aria-checked={target === k}
+              className="segmented__opt"
+              onClick={() => {
+                setTarget(k);
+                const s = existing ? null : suggested(member, k);
+                if (s !== null) setAmount(String(s));
+              }}
+            >
+              {k === 'month' ? t('payments.forMonth') : t('payments.forPrevious')}
+            </button>
+          ))}
+        </div>
+      </div>
       <Field
         id="pay-amount"
         label={t('payments.amount')}

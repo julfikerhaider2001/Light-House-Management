@@ -26,6 +26,8 @@ export const PeriodSchema = z.object({
   snapshot: z.nullable(z.unknown()),
   reopened_at: nullableString,
   reopen_reason: nullableString,
+  // When the automatic month mailer sent this month's report (round 4).
+  emailed_at: z.optional(nullableString),
 });
 
 export const MemberSchema = z.object({
@@ -91,6 +93,8 @@ export const PaymentSchema = z.object({
   date,
   note: nullableString,
   created_at: z.string(),
+  // Added in round 4; older rows and servers mean "this month".
+  applies_to: z.optional(z.enum(['month', 'previous_due'])),
 });
 
 export const BundleSchema = z.object({

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { TablesInsert } from '../../types/database';
 import { getSupabase } from '../supabase';
+import type { PaymentTarget } from '../calc';
 import type { BillKind, ExpenseItem } from './schemas';
 
 /** Runs a write for one mess, then refetches that mess's bundle and activity feed. */
@@ -44,6 +45,27 @@ export async function addExpense(messId: string, input: NewExpense) {
     receipt_path: input.receiptPath ?? null,
   };
   const { error } = await sb.from('expenses').insert(row);
+  if (error) throw error;
+}
+
+/** Correct an expense: everything but the month it belongs to. */
+export async function updateExpense(
+  _messId: string,
+  input: Omit<NewExpense, 'periodId'> & { id: string; keepReceipt?: string | null },
+) {
+  const sb = await getSupabase();
+  const { error } = await sb
+    .from('expenses')
+    .update({
+      member_id: input.memberId,
+      date: input.date,
+      amount: input.amount,
+      kind: input.kind,
+      items: input.items,
+      note: input.note ?? null,
+      receipt_path: input.receiptPath ?? input.keepReceipt ?? null,
+    })
+    .eq('id', input.id);
   if (error) throw error;
 }
 
@@ -139,6 +161,7 @@ export async function addPayment(
     method: PaymentMethod;
     date: string;
     note?: string;
+    appliesTo: PaymentTarget;
   },
 ) {
   const sb = await getSupabase();
@@ -150,6 +173,7 @@ export async function addPayment(
     method: input.method,
     date: input.date,
     note: input.note ?? null,
+    applies_to: input.appliesTo,
   });
   if (error) throw error;
 }
@@ -157,7 +181,14 @@ export async function addPayment(
 /** Correct a recorded payment (the member it belongs to stays fixed). */
 export async function updatePayment(
   _messId: string,
-  input: { id: string; amount: number; method: PaymentMethod; date: string; note?: string },
+  input: {
+    id: string;
+    amount: number;
+    method: PaymentMethod;
+    date: string;
+    note?: string;
+    appliesTo: PaymentTarget;
+  },
 ) {
   const sb = await getSupabase();
   const { error } = await sb
@@ -167,6 +198,7 @@ export async function updatePayment(
       method: input.method,
       date: input.date,
       note: input.note ?? null,
+      applies_to: input.appliesTo,
     })
     .eq('id', input.id);
   if (error) throw error;

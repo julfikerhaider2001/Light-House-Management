@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { computeReport, type CalcInput, type Report } from '../calc';
+import { computeReport, type Report } from '../calc';
+import { toCalcInput } from '../calcInput';
 import { haptic } from '../native';
 import { getSupabase } from '../supabase';
 import { BundleSchema, type Bundle, type Meal } from './schemas';
+
+export { periodMembers, toCalcInput } from '../calcInput';
 
 export const bundleKey = (messId: string, periodId?: string) =>
   ['bundle', messId, periodId ?? 'current'] as const;
@@ -23,35 +26,6 @@ export function useBundle(messId: string | undefined, periodId?: string) {
       return data === null ? null : BundleSchema.parse(data);
     },
   });
-}
-
-/** Members who count in the month: active ones, plus anyone who left but has rows in it. */
-export function periodMembers(bundle: Bundle) {
-  const withRows = new Set([
-    ...bundle.meals.map((m) => m.member_id),
-    ...bundle.expenses.map((e) => e.member_id),
-  ]);
-  return bundle.members.filter((m) => m.status === 'active' || withRows.has(m.id));
-}
-
-export function toCalcInput(bundle: Bundle): CalcInput {
-  return {
-    members: periodMembers(bundle).map((m) => ({ id: m.id, name: m.display_name })),
-    meals: bundle.meals.map((m) => ({ memberId: m.member_id, date: m.date, meals: m.meals })),
-    expenses: bundle.expenses.map((e) => ({
-      memberId: e.member_id,
-      date: e.date,
-      amount: e.amount,
-      kind: e.kind,
-    })),
-    bills: bundle.bills.map((b) => ({ kind: b.kind, amount: b.amount })),
-    rentShares: bundle.rent_shares.map((r) => ({
-      memberId: r.member_id,
-      fixedAmount: r.fixed_amount,
-    })),
-    previousDues: bundle.previous_dues.map((d) => ({ memberId: d.member_id, amount: d.amount })),
-    payments: bundle.payments.map((p) => ({ memberId: p.member_id, amount: p.amount })),
-  };
 }
 
 export function useReport(bundle: Bundle | null | undefined): Report | null {

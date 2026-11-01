@@ -300,6 +300,7 @@ export type Database = {
       payments: {
         Row: {
           amount: number;
+          applies_to: string;
           created_at: string;
           created_by: string | null;
           date: string;
@@ -315,6 +316,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           amount: number;
+          applies_to?: string;
           created_at?: string;
           created_by?: string | null;
           date: string;
@@ -329,6 +331,7 @@ export type Database = {
         };
         Update: {
           amount?: number;
+          applies_to?: string;
           created_at?: string;
           created_by?: string | null;
           date?: string;
@@ -363,6 +366,7 @@ export type Database = {
           closed_at: string | null;
           closed_by: string | null;
           created_at: string;
+          emailed_at: string | null;
           id: string;
           mess_id: string;
           month: string;
@@ -376,6 +380,7 @@ export type Database = {
           closed_at?: string | null;
           closed_by?: string | null;
           created_at?: string;
+          emailed_at?: string | null;
           id?: string;
           mess_id: string;
           month: string;
@@ -388,6 +393,7 @@ export type Database = {
           closed_at?: string | null;
           closed_by?: string | null;
           created_at?: string;
+          emailed_at?: string | null;
           id?: string;
           mess_id?: string;
           month?: string;
@@ -453,6 +459,7 @@ export type Database = {
           display_name: string;
           id: string;
           phone: string | null;
+          photo_removed: boolean;
         };
         ComputedFields: never;
         Insert: {
@@ -461,6 +468,7 @@ export type Database = {
           display_name: string;
           id: string;
           phone?: string | null;
+          photo_removed?: boolean;
         };
         Update: {
           avatar_path?: string | null;
@@ -468,6 +476,7 @@ export type Database = {
           display_name?: string;
           id?: string;
           phone?: string | null;
+          photo_removed?: boolean;
         };
         Relationships: [];
       };

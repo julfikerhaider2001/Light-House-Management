@@ -8,6 +8,7 @@ import { t } from '../i18n';
 import { useBundle, useReport } from '../lib/api/bundle';
 import { useCurrentMess } from '../lib/api/current';
 import { closePeriod, reopenPeriod, useMessMutation } from '../lib/api/writes';
+import { closingCarry } from '../lib/calcInput';
 import { mealCount, taka } from '../lib/format';
 import { haptic } from '../lib/native';
 import { addDays, formatMonth, monthDays } from '../lib/time';
@@ -90,10 +91,7 @@ export default function ClosePage() {
           string,
           unknown
         >,
-        carry: report.members.map((m) => ({
-          member_id: m.memberId,
-          amount: Number(m.balance.toFixed(2)),
-        })),
+        carry: closingCarry(report),
       },
       {
         onSuccess: () => {

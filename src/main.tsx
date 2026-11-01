@@ -6,7 +6,10 @@ import { registerSW } from 'virtual:pwa-register';
 import { env } from './lib/env';
 import { watchForNewBuild } from './lib/freshness';
 import { initNative } from './lib/native';
+import { initTheme, setTheme } from './lib/theme';
 import './styles/tokens.css';
+
+initTheme();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,7 +28,8 @@ createRoot(root).render(
   </StrictMode>,
 );
 
-void initNative();
+// The status bar follows the theme once the native plugins are ready.
+void initNative().then(() => setTheme({}));
 
 // autoUpdate: a new deploy's service worker takes over and the page reloads once, so
 // returning visitors (and the APK, which loads this site) never keep an old build.

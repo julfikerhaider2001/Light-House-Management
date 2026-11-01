@@ -13,15 +13,14 @@ export function isNative(): boolean {
 /** Status bar, splash and the hardware back button. Call once at startup. */
 export async function initNative(): Promise<void> {
   if (!isNative()) return;
-  const [{ App }, { StatusBar, Style }, { SplashScreen }] = await Promise.all([
+  const [{ App }, { StatusBar }, { SplashScreen }] = await Promise.all([
     import('@capacitor/app'),
     import('@capacitor/status-bar'),
     import('@capacitor/splash-screen'),
   ]);
 
+  // Colours come from the theme (lib/theme.ts); the app bar pads itself below the status bar.
   await StatusBar.setOverlaysWebView({ overlay: false }).catch(() => undefined);
-  await StatusBar.setStyle({ style: Style.Dark }).catch(() => undefined);
-  await StatusBar.setBackgroundColor({ color: '#050807' }).catch(() => undefined);
   await SplashScreen.hide().catch(() => undefined);
 
   await App.addListener('backButton', ({ canGoBack }) => {
